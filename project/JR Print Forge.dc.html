@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="description" content="JR Print Forge — precision 3D printing, rapid prototyping, and small-batch manufacturing. Quote in one business day, parts in three.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<script type="module" src="./forge-hero.js"></script>
+<script src="./image-slot.js"></script>
+<style>
+  html{scroll-behavior:smooth}
+  body{margin:0;background:#0B0C0D;color:#C7CDD1;font-family:'IBM Plex Sans',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  ::selection{background:#FF6B00;color:#0B0C0D}
+  a{color:#00BFFF;text-decoration:none}
+  a:hover{color:#FF6B00}
+  input,textarea,select,button{font-family:inherit}
+  input:focus-visible,textarea:focus-visible,select:focus-visible,button:focus-visible,a:focus-visible{outline:2px solid #00BFFF;outline-offset:2px}
+  @keyframes forgePulse{0%{opacity:.25;transform:scale(.6)}70%{opacity:0;transform:scale(1.9)}100%{opacity:0;transform:scale(1.9)}}
+  @keyframes forgeScan{0%{transform:translateY(-100%)}100%{transform:translateY(400%)}}
+</style>
+</helmet>
+
+<div ref="{{ rootRef }}" style="background:#0B0C0D;color:#C7CDD1;overflow-x:hidden">
+
+<header style="position:sticky;top:0;z-index:60;display:flex;align-items:center;justify-content:space-between;gap:20px;padding:12px clamp(16px,4vw,44px);background:rgba(11,12,13,.86);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid rgba(255,255,255,.08)">
+  <a href="#top" style="display:flex;align-items:center;gap:11px;text-decoration:none">
+    <img src="uploads/jr-print-forge.jpg" alt="JR Print Forge" style="width:34px;height:34px;display:block;border:1px solid rgba(255,255,255,.14)">
+    <span style="display:flex;flex-direction:column;line-height:1">
+      <span style="font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:15px;letter-spacing:.14em;color:#F5F5F5">JR PRINT FORGE</span>
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:.34em;color:#6E777C;margin-top:4px">ADDITIVE MANUFACTURING</span>
+    </span>
+  </a>
+  <nav style="display:flex;flex-wrap:wrap;align-items:center;gap:22px;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.18em;text-transform:uppercase">
+    <a href="#services" style="color:#9AA3A8" style-hover="color:#00BFFF">Services</a>
+    <a href="#process" style="color:#9AA3A8" style-hover="color:#00BFFF">Process</a>
+    <a href="#work" style="color:#9AA3A8" style-hover="color:#00BFFF">Work</a>
+    <a href="#why" style="color:#9AA3A8" style-hover="color:#00BFFF">Why Us</a>
+    <a href="#quote" style="display:inline-block;padding:9px 16px;border:1px solid #FF6B00;color:#FF6B00;letter-spacing:.18em" style-hover="background:#FF6B00;color:#0B0C0D">Get a Quote</a>
+  </nav>
+</header>
+
+<section id="top" data-screen-label="Hero" style="position:relative;min-height:min(92vh,880px);display:flex;align-items:flex-end;overflow:hidden;border-bottom:1px solid rgba(255,255,255,.08)">
+  <forge-hero bottom-inset="58" style="position:absolute;inset:0;z-index:0;background:radial-gradient(60% 60% at 62% 44%,rgba(0,191,255,.10),transparent 72%)"></forge-hero>
+
+  <div data-pm="wipe" style="position:absolute;inset:0;z-index:1;pointer-events:none;background-image:linear-gradient(90deg,rgba(11,12,13,.94) 0%,rgba(11,12,13,.86) 38%,rgba(11,12,13,.42) 66%,rgba(11,12,13,.2) 100%),linear-gradient(rgba(0,191,255,.10) 1px,transparent 1px),linear-gradient(90deg,rgba(0,191,255,.10) 1px,transparent 1px),linear-gradient(rgba(0,191,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(0,191,255,.04) 1px,transparent 1px);background-size:100% 100%,120px 120px,120px 120px,24px 24px,24px 24px;mask-image:radial-gradient(circle var(--pm-r,200px) at var(--mx,72%) var(--my,46%),transparent 0 38%,#000 96%);-webkit-mask-image:radial-gradient(circle var(--pm-r,200px) at var(--mx,72%) var(--my,46%),transparent 0 38%,#000 96%)"></div>
+
+  <div style="position:absolute;inset:0;z-index:2;pointer-events:none;background:radial-gradient(circle var(--pm-r,200px) at var(--mx,72%) var(--my,46%),rgba(0,191,255,.13),transparent 70%)"></div>
+
+  <div style="position:relative;z-index:3;width:100%;max-width:1320px;margin:0 auto;padding:clamp(96px,14vh,170px) clamp(20px,5vw,64px) clamp(96px,11vw,130px);pointer-events:none">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:26px">
+      <span style="width:7px;height:7px;background:#FF6B00;box-shadow:0 0 14px #FF6B00;flex:none"></span>
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.3em;text-transform:uppercase;color:#9AA3A8">Engineering-grade additive manufacturing</span>
+    </div>
+    <h1 style="margin:0 0 20px;max-width:16ch;font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:clamp(40px,6.6vw,84px);line-height:.98;letter-spacing:-.02em;color:#F5F5F5;text-wrap:balance">Precision 3D Printing.<br><span style="color:#FF6B00">Forged</span> for Innovation.</h1>
+    <p style="margin:0 0 34px;max-width:52ch;font-size:clamp(15.5px,1.5vw,18.5px);line-height:1.62;color:#B4BCC1">From concept to production-quality parts, JR Print Forge transforms ideas into reality.</p>
+    <div style="display:flex;flex-wrap:wrap;gap:14px;pointer-events:auto">
+      <a href="#quote" style="display:inline-flex;align-items:center;gap:10px;padding:16px 28px;background:#FF6B00;color:#0B0C0D;font-family:'IBM Plex Mono',monospace;font-size:11.5px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;white-space:nowrap;border:1px solid #FF6B00" style-hover="background:#ff8124;border-color:#ff8124;color:#0B0C0D">Get a Quote <span style="color:#0B0C0D">→</span></a>
+      <a href="#quote" onClick="{{ focusUpload }}" style="display:inline-flex;align-items:center;gap:10px;padding:16px 28px;background:rgba(0,191,255,.06);color:#00BFFF;font-family:'IBM Plex Mono',monospace;font-size:11.5px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;border:1px solid rgba(0,191,255,.45)" style-hover="background:rgba(0,191,255,.14);color:#F5F5F5">Upload Your Design</a>
+    </div>
+  </div>
+
+  <div style="position:absolute;left:0;right:0;bottom:0;z-index:3;display:flex;flex-wrap:wrap;gap:0;border-top:1px solid rgba(255,255,255,.08);background:rgba(11,12,13,.7);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:#6E777C">
+    <span style="flex:1 1 180px;padding:13px clamp(20px,5vw,64px);border-right:1px solid rgba(255,255,255,.06)">Live render · <span style="color:#00BFFF">{{ backend }}</span></span>
+    <span style="flex:1 1 150px;padding:13px 20px;border-right:1px solid rgba(255,255,255,.06)">Vertices <span style="color:#F5F5F5">{{ verts }}</span></span>
+    <span style="flex:1 1 140px;padding:13px 20px;border-right:1px solid rgba(255,255,255,.06)">Strikes <span style="color:#F5F5F5">35/min</span></span>
+    <span style="flex:1 1 200px;padding:13px 20px">Printed planetary gearbox · <a href="Planetary Gearbox.html" style="color:#FF6B00;letter-spacing:.16em">inspect &amp; download</a></span>
+  </div>
+</section>
+
+<section id="services" data-screen-label="Services" style="max-width:1320px;margin:0 auto;padding:clamp(72px,10vw,140px) clamp(20px,5vw,64px)">
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:24px 40px;align-items:end;margin-bottom:48px">
+    <div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.3em;text-transform:uppercase;color:#00BFFF;margin-bottom:16px">01 — Capabilities</div>
+      <h2 style="margin:0;font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:clamp(30px,4vw,52px);line-height:1.04;letter-spacing:-.015em;color:#F5F5F5">Six ways we make your part real.</h2>
+    </div>
+    <p style="margin:0;max-width:34ch;font-size:15px;line-height:1.65;color:#8E969B">Hover any card — the scan reveals what the machine sees.</p>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,290px),1fr));gap:1px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.08)">
+
+    <article data-pm="reveal" data-reveal style="position:relative;overflow:hidden;padding:36px 30px 32px;background:#131415;min-height:270px" style-hover="background:#171819">
+      <div data-pm-layer data-pm-fade style="position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .28s ease;background-image:repeating-linear-gradient(135deg,rgba(0,191,255,.16) 0 1px,transparent 1px 7px);mask-image:radial-gradient(circle var(--pm-r,200px) at var(--mx,50%) var(--my,50%),#000 0 46%,transparent 92%);-webkit-mask-image:radial-gradient(circle var(--pm-r,200px) at var(--mx,50%) var(--my,50%),#000 0 46%,transparent 92%)"></div>
+      <div style="position:relative;display:flex;flex-direction:column;height:100%">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.2em;color:#FF6B00;margin-bottom:22px">01</div>
+        <h3 style="margin:0 0 12px;font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:21px;color:#F5F5F5">Rapid Prototyping</h3>
+        <p style="margin:0 0 22px;font-size:14.5px;line-height:1.62;color:#8E969B">Iterate in days, not quarters. Functional prototypes off the plate and onto your bench while the idea is still hot.</p>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:#00BFFF">
+          <span style="padding:5px 10px;white-space:nowrap;border:1px solid rgba(0,191,255,.25);background:rgba(0,191,255,.05)">24–72 h</span>
+          <span style="padding:5px 10px;white-space:nowrap;border:1px solid rgba(0,191,255,.25);background:rgba(0,191,255,.05)">FDM + resin</span>
+        </div>
+      </div>
+    </article>
+
+    <article data-pm="reveal" data-reveal style="position:relative;overflow:hidden;padding:36px 30px 32px;background:#131415;min-height:270px" style-hover="background:#171819">
+      <div data-pm-layer data-pm-fade style="position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .28s ease;background-image:repeating-linear-gradient(135deg,rgba(0,191,255,.16) 0 1px,transparent 1px 7px);mask-image:radial-gradient(circle var(--pm-r,200px) at var(--mx,50%) var(--my,50%),#000 0 46%,transparent 92%);-webkit-mask-image:radial-gradient(circle var(--pm-r,200px) at var(--mx,50%) var(--my,50%),#000 0 46%,transparent 92%)"></div>
+      <div style="position:relative;display:flex;flex-direction:column;height:100%">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.2em;color:#FF6B00;margin-bottom:22px">02</div>
+        <h3 style="margin:0 0 12px;font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:21px;color:#F5F5F5">Functional Parts</h3>
+        <p style="margin:0 0 22px;font-size:14.5px;line-height:1.62;color:#8E969B">End-use components engineered to carry load, heat and abuse — not just to look the part on a shelf.</p>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:#00BFFF">
+          <span style="padding:5px 10px;white-space:nowrap;border:1px solid rgba(0,191,255,.25);background:rgba(0,191,255,.05)">PA12-CF · ASA</span>
+          <span style="padding:5px 10px;white-space:nowrap;border:1px solid rgba(0,191,255,.25);background:rgba(0,191,255,.05)">Load tested</span>
+        </div>
+      </div>
+    </article>
+
+    <article data-pm="reveal" data-reveal style="position:relative;overflow:hidden;padding:36px 30px 32px;background:#131415;min-height:270px" style-hover="background:#171819">
+      <div data-pm-layer data-pm-fade style="position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .28s ease;background-image:repeating-linear-gradient(135deg,rgba(0,191,255,.16) 0 1px,transparent 1px 7px);mask-image:radial-gradient(circle var(--pm-r,200px) at var(--mx,50%) var(--my,50%),#000 0 46%,transparent 92%);-webkit-mask-image:radial-gradient(circle var(--pm-r,200px) at var(--mx,50%) var(--my,50%),#000 0 46%,transparent 92%)"></div>
+      <div style="position:relative;display:flex;flex-direction:column;height:100%">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.2em;color:#FF6B00;margin-bottom:22px">03</div>
+        <h3 style="margin:0 0 12px;font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:21px;color:#F5F5F5">Resin Printing</h3>
+        <p style="margin:0 0 22px;font-size:14.5px;line-height:1.62;color:#8E969B">8K masked stereolithography for surfaces that need no apology. Housings, masters, miniatures, optics fixtures.</p>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:#00BFFF">
+          <span style="padding:5px 10px;white-space:nowrap;border:1px solid rgba(0,191,255,.25);background:rgba(0,191,255,.05)">25 µm layers</span>
+          <span style="padding:5px 10px;white-space:nowrap;border:1px solid rgba(0,191,255,.25);background:rgba(0,191,255,.05)">Cast ready</span>
+        </div>
+      </div>
+    </article>
+
+    <article data-pm="reveal" data-reveal style="position:relative;overflow:hidden;padding:36px 30px 32px;background:#131415;min-height:270px" style-hover="background:#171819">
+      <div data-pm-layer data-pm-fade style="position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .28s ease;background-image:repeating-linear-gradient(135deg,rgba(0,191,255,.16) 0 1px,transparent 1px 7px);mask-image:radial-gradient(circle var(--pm-r,200px) at var(--mx,50%) var(--my,50%),#000 0 46%,transparent 92%);-webkit-mask-image:radial-gradient(circle var(--pm-r,200px) at var(--mx,50%) var(--my,50%),#000 0 46%,transparent 92%)"></div>
+      <div style="position:relative;display:flex;flex-direction:column;height:100%">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.2em;color:#FF6B00;margin-bottom:22px">04</div>
+        <h3 style="margin:0 0 12px;font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:21px;color:#F5F5F5">FDM Printing</h3>
+        <p style="margin:0 0 22px;font-size:14.5px;line-height:1.62;color:#8E969B">Production-grade filament printing in engineering polymers, with hardened nozzles and enclosed chambers.</p>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:#00BFFF">
+          <span style="padding:5px 10px;white-space:nowrap;border:1px solid rgba(0,191,255,.25);background:rgba(0,191,255,.05)">0.4 / 0.6 mm</span>
+          <span style="padding:5px 10px;white-space:nowrap;border:1px solid rgba(0,191,255,.25);background:rgba(0,191,255,.05)">Enclosed</span>
+        </div>
+      </div>
+    </article>
+
+    <article data-pm="reveal" data-reveal style="position:relative;overflow:hidden;padding:36px 30px 32px;background:#131415;min-height:270px" style-hover="background:#171819">
+      <div data-pm-layer data-pm-fade style="position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .28s ease;background-image:repeating-linear-gradient(135deg,rgba(0,191,255,.16) 0 1px,transparent 1px 7px);mask-image:radial-gradient(circle var(--pm-r,200px) at var(--mx,50%) var(--my,50%),#000 0 46%,transparent 92%);-webkit-mask-image:radial-gradient(circle var(--pm-r,200px) at var(--mx,50%) var(--my,50%),#000 0 46%,transparent 92%)"></div>
+      <div style="position:relative;display:flex;flex-direction:column;height:100%">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.2em;color:#FF6B00;margin-bottom:22px">05</div>
+        <h3 style="margin:0 0 12px;font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:21px;color:#F5F5F5">CAD Design Services</h3>
+        <p style="margin:0 0 22px;font-size:14.5px;line-height:1.62;color:#8E969B">Napkin sketch, mesh scan or half-finished STEP file — we take it to a model that manufactures cleanly.</p>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:#00BFFF">
+          <span style="padding:5px 10px;white-space:nowrap;border:1px solid rgba(0,191,255,.25);background:rgba(0,191,255,.05)">DFM review</span>
+          <span style="padding:5px 10px;white-space:nowrap;border:1px solid rgba(0,191,255,.25);background:rgba(0,191,255,.05)">STEP + STL out</span>
+        </div>
+      </div>
+    </article>
+
+    <article data-pm="reveal" data-reveal style="position:relative;overflow:hidden;padding:36px 30px 32px;background:#131415;min-height:270px" style-hover="background:#171819">
+      <div data-pm-layer data-pm-fade style="position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .28s ease;background-image:repeating-linear-gradient(135deg,rgba(0,191,255,.16) 0 1px,transparent 1px 7px);mask-image:radial-gradient(circle var(--pm-r,200px) at var(--mx,50%) var(--my,50%),#000 0 46%,transparent 92%);-webkit-mask-image:radial-gradient(circle var(--pm-r,200px) at var(--mx,50%) var(--my,50%),#000 0 46%,transparent 92%)"></div>
+      <div style="position:relative;display:flex;flex-direction:column;height:100%">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.2em;color:#FF6B00;margin-bottom:22px">06</div>
+        <h3 style="margin:0 0 12px;font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:21px;color:#F5F5F5">Production Runs</h3>
+        <p style="margin:0 0 22px;font-size:14.5px;line-height:1.62;color:#8E969B">Small-batch manufacturing with repeatable fixtures, batch inspection and serialized, archived output.</p>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:#00BFFF">
+          <span style="padding:5px 10px;white-space:nowrap;border:1px solid rgba(0,191,255,.25);background:rgba(0,191,255,.05)">10–5,000 units</span>
+          <span style="padding:5px 10px;white-space:nowrap;border:1px solid rgba(0,191,255,.25);background:rgba(0,191,255,.05)">Batch QC</span>
+        </div>
+      </div>
+    </article>
+  </div>
+</section>
+
+<section id="process" data-screen-label="Process" style="border-top:1px solid rgba(255,255,255,.08);border-bottom:1px solid rgba(255,255,255,.08);background:linear-gradient(180deg,#0E0F10,#0B0C0D)">
+  <div style="max-width:1320px;margin:0 auto;padding:clamp(72px,10vw,140px) clamp(20px,5vw,64px)">
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.3em;text-transform:uppercase;color:#00BFFF;margin-bottom:16px">02 — Process</div>
+    <h2 style="margin:0 0 14px;max-width:18ch;font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:clamp(30px,4vw,52px);line-height:1.04;letter-spacing:-.015em;color:#F5F5F5">Four steps. No black boxes.</h2>
+    <p style="margin:0 0 56px;max-width:56ch;font-size:15.5px;line-height:1.65;color:#8E969B">Every job runs the same route, and you can see where yours is at each stage.</p>
+
+    <div style="position:relative;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:1px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.08)">
+      <div data-step data-reveal style="position:relative;padding:34px 28px 30px;background:#131415">
+        <div data-step-bar style="position:absolute;left:0;top:0;height:2px;width:0;background:#FF6B00;transition:width .9s cubic-bezier(.2,.7,.2,1)"></div>
+        <div style="font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:44px;line-height:1;color:rgba(0,191,255,.22);margin-bottom:18px">01</div>
+        <h3 style="margin:0 0 10px;font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:19px;color:#F5F5F5">Submit Design</h3>
+        <p style="margin:0 0 18px;font-size:14px;line-height:1.6;color:#8E969B">Upload STL, STEP or a sketch. Tell us the load case, the fit that matters and the finish you want.</p>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:#FF6B00">5 minutes</span>
+      </div>
+      <div data-step data-reveal style="position:relative;padding:34px 28px 30px;background:#131415">
+        <div data-step-bar style="position:absolute;left:0;top:0;height:2px;width:0;background:#FF6B00;transition:width .9s cubic-bezier(.2,.7,.2,1)"></div>
+        <div style="font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:44px;line-height:1;color:rgba(0,191,255,.22);margin-bottom:18px">02</div>
+        <h3 style="margin:0 0 10px;font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:19px;color:#F5F5F5">Engineering Review</h3>
+        <p style="margin:0 0 18px;font-size:14px;line-height:1.6;color:#8E969B">A human checks wall thickness, print orientation, tolerance stack and material fit — then quotes it.</p>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:#FF6B00">≤ 1 business day</span>
+      </div>
+      <div data-step data-reveal style="position:relative;padding:34px 28px 30px;background:#131415">
+        <div data-step-bar style="position:absolute;left:0;top:0;height:2px;width:0;background:#FF6B00;transition:width .9s cubic-bezier(.2,.7,.2,1)"></div>
+        <div style="font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:44px;line-height:1;color:rgba(0,191,255,.22);margin-bottom:18px">03</div>
+        <h3 style="margin:0 0 10px;font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:19px;color:#F5F5F5">Print &amp; Manufacture</h3>
+        <p style="margin:0 0 18px;font-size:14px;line-height:1.6;color:#8E969B">Machines assigned by geometry, not convenience. De-supported, finished and dimensionally checked.</p>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:#FF6B00">3 business days</span>
+      </div>
+      <div data-step data-reveal style="position:relative;padding:34px 28px 30px;background:#131415">
+        <div data-step-bar style="position:absolute;left:0;top:0;height:2px;width:0;background:#FF6B00;transition:width .9s cubic-bezier(.2,.7,.2,1)"></div>
+        <div style="font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:44px;line-height:1;color:rgba(0,191,255,.22);margin-bottom:18px">04</div>
+        <h3 style="margin:0 0 10px;font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:19px;color:#F5F5F5">Delivery</h3>
+        <p style="margin:0 0 18px;font-size:14px;line-height:1.6;color:#8E969B">Packed, labeled, tracked. Files and settings archived so the reorder is one line of email.</p>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:#FF6B00">Tracked shipping</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="work" data-screen-label="Portfolio" style="max-width:1320px;margin:0 auto;padding:clamp(72px,10vw,140px) clamp(20px,5vw,64px)">
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:24px 40px;align-items:end;margin-bottom:48px">
+    <div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.3em;text-transform:uppercase;color:#00BFFF;margin-bottom:16px">03 — Selected work</div>
+      <h2 style="margin:0;font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:clamp(30px,4vw,52px);line-height:1.04;letter-spacing:-.015em;color:#F5F5F5">CAD in. Part out.</h2>
+    </div>
+    <p style="margin:0;max-width:34ch;font-size:15px;line-height:1.65;color:#8E969B">Move your cursor across a tile to burn through the CAD layer. Drop your own photos straight onto any slot.</p>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:20px">
+    <figure data-pm="wipe" data-reveal style="position:relative;margin:0;aspect-ratio:4/3;border:1px solid rgba(255,255,255,.1);overflow:hidden;background:#131415">
+      <image-slot id="work-engineering" shape="rect" placeholder="Drop an engineering part photo"></image-slot>
+      <div data-pm-layer style="position:absolute;inset:0;pointer-events:none;background-color:rgba(11,12,13,.9);background-image:linear-gradient(rgba(0,191,255,.22) 1px,transparent 1px),linear-gradient(90deg,rgba(0,191,255,.22) 1px,transparent 1px);background-size:26px 26px;mask-image:radial-gradient(circle var(--pm-r,200px) at var(--mx,50%) var(--my,50%),transparent 0 34%,#000 88%);-webkit-mask-image:radial-gradient(circle var(--pm-r,200px) at var(--mx,50%) var(--my,50%),transparent 0 34%,#000 88%)"></div>
+      <figcaption style="position:absolute;left:0;right:0;bottom:0;pointer-events:none;display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:16px 18px;background:linear-gradient(transparent,rgba(11,12,13,.92))">
+        <span style="font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:17px;color:#F5F5F5">Engineering Parts</span>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.18em;text-transform:uppercase;white-space:nowrap;color:#00BFFF">CAD → Print</span>
+      </figcaption>
+    </figure>
+
+    <figure data-pm="wipe" data-reveal style="position:relative;margin:0;aspect-ratio:4/3;border:1px solid rgba(255,255,255,.1);overflow:hidden;background:#131415">
+      <image-slot id="work-consumer" shape="rect" placeholder="Drop a consumer product photo"></image-slot>
+      <div data-pm-layer style="position:absolute;inset:0;pointer-events:none;background-color:rgba(11,12,13,.9);background-image:linear-gradient(rgba(0,191,255,.22) 1px,transparent 1px),linear-gradient(90deg,rgba(0,191,255,.22) 1px,transparent 1px);background-size:26px 26px;mask-image:radial-gradient(circle var(--pm-r,200px) at var(--mx,50%) var(--my,50%),transparent 0 34%,#000 88%);-webkit-mask-image:radial-gradient(circle var(--pm-r,200px) at var(--mx,50%) var(--my,50%),transparent 0 34%,#000 88%)"></div>
+      <figcaption style="position:absolute;left:0;right:0;bottom:0;pointer-events:none;display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:16px 18px;background:linear-gradient(transparent,rgba(11,12,13,.92))">
+        <span style="font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:17px;color:#F5F5F5">Consumer Products</span>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.18em;text-transform:uppercase;white-space:nowrap;color:#00BFFF">CAD → Print</span>
+      </figcaption>
+    </figure>
+
+    <figure data-pm="wipe" data-reveal style="position:relative;margin:0;aspect-ratio:4/3;border:1px solid rgba(255,255,255,.1);overflow:hidden;background:#131415">
+      <image-slot id="work-custom" shape="rect" placeholder="Drop a custom project photo"></image-slot>
+      <div data-pm-layer style="position:absolute;inset:0;pointer-events:none;background-color:rgba(11,12,13,.9);background-image:linear-gradient(rgba(0,191,255,.22) 1px,transparent 1px),linear-gradient(90deg,rgba(0,191,255,.22) 1px,transparent 1px);background-size:26px 26px;mask-image:radial-gradient(circle var(--pm-r,200px) at var(--mx,50%) var(--my,50%),transparent 0 34%,#000 88%);-webkit-mask-image:radial-gradient(circle var(--pm-r,200px) at var(--mx,50%) var(--my,50%),transparent 0 34%,#000 88%)"></div>
+      <figcaption style="position:absolute;left:0;right:0;bottom:0;pointer-events:none;display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:16px 18px;background:linear-gradient(transparent,rgba(11,12,13,.92))">
+        <span style="font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:17px;color:#F5F5F5">Custom Projects</span>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.18em;text-transform:uppercase;white-space:nowrap;color:#00BFFF">CAD → Print</span>
+      </figcaption>
+    </figure>
+
+    <figure data-pm="wipe" data-reveal style="position:relative;margin:0;aspect-ratio:4/3;border:1px solid rgba(255,255,255,.1);overflow:hidden;background:#131415">
+      <image-slot id="work-prototypes" shape="rect" placeholder="Drop a prototype photo"></image-slot>
+      <div data-pm-layer style="position:absolute;inset:0;pointer-events:none;background-color:rgba(11,12,13,.9);background-image:linear-gradient(rgba(0,191,255,.22) 1px,transparent 1px),linear-gradient(90deg,rgba(0,191,255,.22) 1px,transparent 1px);background-size:26px 26px;mask-image:radial-gradient(circle var(--pm-r,200px) at var(--mx,50%) var(--my,50%),transparent 0 34%,#000 88%);-webkit-mask-image:radial-gradient(circle var(--pm-r,200px) at var(--mx,50%) var(--my,50%),transparent 0 34%,#000 88%)"></div>
+      <figcaption style="position:absolute;left:0;right:0;bottom:0;pointer-events:none;display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:16px 18px;background:linear-gradient(transparent,rgba(11,12,13,.92))">
+        <span style="font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:17px;color:#F5F5F5">Prototypes</span>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.18em;text-transform:uppercase;white-space:nowrap;color:#00BFFF">CAD → Print</span>
+      </figcaption>
+    </figure>
+  </div>
+</section>
+
+<section id="why" data-screen-label="Why us" style="border-top:1px solid rgba(255,255,255,.08);background:#0E0F10">
+  <div style="max-width:1320px;margin:0 auto;padding:clamp(72px,10vw,140px) clamp(20px,5vw,64px)">
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.3em;text-transform:uppercase;color:#00BFFF;margin-bottom:16px">04 — Why JR Print Forge</div>
+    <h2 style="margin:0 0 56px;max-width:20ch;font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:clamp(30px,4vw,52px);line-height:1.04;letter-spacing:-.015em;color:#F5F5F5">The numbers we hold ourselves to.</h2>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,210px),1fr));gap:1px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.08)">
+      <div data-reveal style="padding:34px 26px;background:#131415">
+        <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:14px"><span data-count="1" data-dec="0" style="font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:clamp(40px,5vw,60px);line-height:1;color:#FF6B00">1</span><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.14em;color:#8E969B">day</span></div>
+        <h3 style="margin:0 0 8px;font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:16px;color:#F5F5F5">Fast Turnaround</h3>
+        <p style="margin:0;font-size:13.5px;line-height:1.6;color:#8E969B">Quotes land in your inbox within one business day of upload.</p>
+      </div>
+      <div data-reveal style="padding:34px 26px;background:#131415">
+        <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:14px"><span data-count="3" data-dec="0" style="font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:clamp(40px,5vw,60px);line-height:1;color:#FF6B00">3</span><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.14em;color:#8E969B">days</span></div>
+        <h3 style="margin:0 0 8px;font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:16px;color:#F5F5F5">Production Standard</h3>
+        <p style="margin:0;font-size:13.5px;line-height:1.6;color:#8E969B">Standard build time after you approve the quote. Rush available.</p>
+      </div>
+      <div data-reveal style="padding:34px 26px;background:#131415">
+        <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:14px"><span style="font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:clamp(40px,5vw,60px);line-height:1;color:#00BFFF">±</span><span data-count="0.10" data-dec="2" style="font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:clamp(40px,5vw,60px);line-height:1;color:#00BFFF">0.10</span><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.14em;color:#8E969B">mm</span></div>
+        <h3 style="margin:0 0 8px;font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:16px;color:#F5F5F5">Precision Manufacturing</h3>
+        <p style="margin:0;font-size:13.5px;line-height:1.6;color:#8E969B">Typical achievable tolerance on FDM features. Tighter on resin.</p>
+      </div>
+      <div data-reveal style="padding:34px 26px;background:#131415">
+        <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:14px"><span data-count="12" data-dec="0" style="font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:clamp(40px,5vw,60px);line-height:1;color:#00BFFF">12</span><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.14em;color:#8E969B">materials</span></div>
+        <h3 style="margin:0 0 8px;font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:16px;color:#F5F5F5">Quality Materials</h3>
+        <p style="margin:0;font-size:13.5px;line-height:1.6;color:#8E969B">Named, traceable polymers and resins — never mystery filament.</p>
+      </div>
+      <div data-reveal style="padding:34px 26px;background:#131415">
+        <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:14px"><span data-count="100" data-dec="0" style="font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:clamp(40px,5vw,60px);line-height:1;color:#00BFFF">100</span><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.14em;color:#8E969B">% checked</span></div>
+        <h3 style="margin:0 0 8px;font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:16px;color:#F5F5F5">Expert Support</h3>
+        <p style="margin:0;font-size:13.5px;line-height:1.6;color:#8E969B">Every part is inspected by the engineer who set it up, before it ships.</p>
+      </div>
+      <div data-reveal style="padding:34px 26px;background:#131415">
+        <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:14px"><span style="font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:clamp(40px,5vw,60px);line-height:1;color:#00BFFF">$</span><span data-count="65" data-dec="0" style="font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:clamp(40px,5vw,60px);line-height:1;color:#00BFFF">65</span><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.14em;color:#8E969B">setup</span></div>
+        <h3 style="margin:0 0 8px;font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:16px;color:#F5F5F5">Competitive Pricing</h3>
+        <p style="margin:0;font-size:13.5px;line-height:1.6;color:#8E969B">One flat setup fee, quoted up front — never discovered on the invoice.</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<section data-screen-label="Testimonials" style="border-top:1px solid rgba(255,255,255,.08);overflow:hidden">
+  <div style="max-width:1320px;margin:0 auto;padding:clamp(72px,10vw,120px) clamp(20px,5vw,64px)">
+    <div style="display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:20px;margin-bottom:40px">
+      <div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.3em;text-transform:uppercase;color:#00BFFF;margin-bottom:16px">05 — Clients</div>
+        <h2 style="margin:0;font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:clamp(28px,3.4vw,44px);line-height:1.05;letter-spacing:-.015em;color:#F5F5F5">What engineers say after the first order.</h2>
+      </div>
+      <div style="display:flex;gap:10px">
+        <button onClick="{{ prevQuote }}" aria-label="Previous testimonial" style="width:46px;height:46px;background:transparent;border:1px solid rgba(255,255,255,.16);color:#9AA3A8;font-size:16px;cursor:pointer" style-hover="border-color:#00BFFF;color:#00BFFF">←</button>
+        <button onClick="{{ nextQuote }}" aria-label="Next testimonial" style="width:46px;height:46px;background:transparent;border:1px solid rgba(255,255,255,.16);color:#9AA3A8;font-size:16px;cursor:pointer" style-hover="border-color:#00BFFF;color:#00BFFF">→</button>
+      </div>
+    </div>
+
+    <div style="position:relative;border:1px solid rgba(255,255,255,.1);background:linear-gradient(180deg,#151617,#111213);overflow:hidden">
+      <div data-pm="reveal" data-pm-fade style="position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .28s ease;background-image:repeating-linear-gradient(90deg,rgba(0,191,255,.12) 0 1px,transparent 1px 9px);mask-image:radial-gradient(circle var(--pm-r,200px) at var(--mx,50%) var(--my,50%),#000 0 40%,transparent 88%);-webkit-mask-image:radial-gradient(circle var(--pm-r,200px) at var(--mx,50%) var(--my,50%),#000 0 40%,transparent 88%)"></div>
+      <div style="position:relative;padding:clamp(34px,5vw,64px);min-height:260px;display:flex;flex-direction:column;justify-content:space-between;gap:28px">
+        <blockquote style="margin:0;max-width:44ch;font-family:'Chakra Petch',sans-serif;font-weight:500;font-size:clamp(20px,2.6vw,30px);line-height:1.34;color:#F5F5F5">{{ quoteText }}</blockquote>
+        <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px;border-top:1px solid rgba(255,255,255,.08);padding-top:20px">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:#9AA3A8">{{ quoteWho }}</div>
+          <div style="display:flex;gap:7px">
+            <span data-dot="0" style="width:26px;height:2px;background:#FF6B00"></span>
+            <span data-dot="1" style="width:26px;height:2px;background:rgba(255,255,255,.18)"></span>
+            <span data-dot="2" style="width:26px;height:2px;background:rgba(255,255,255,.18)"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p style="margin:14px 0 0;font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:#5E666B">Placeholder quotes — swap for real client words before launch.</p>
+  </div>
+</section>
+
+<section id="quote" data-screen-label="Quote request" style="border-top:1px solid rgba(255,255,255,.08);background:linear-gradient(180deg,#0E0F10,#0B0C0D)">
+  <div style="max-width:1320px;margin:0 auto;padding:clamp(72px,10vw,140px) clamp(20px,5vw,64px)">
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.3em;text-transform:uppercase;color:#FF6B00;margin-bottom:16px">06 — Request a quote</div>
+    <h2 style="margin:0 0 14px;max-width:20ch;font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:clamp(30px,4vw,52px);line-height:1.04;letter-spacing:-.015em;color:#F5F5F5">Price it now. Confirm it tomorrow.</h2>
+    <p style="margin:0 0 48px;max-width:56ch;font-size:15.5px;line-height:1.65;color:#8E969B">The estimator below gives you a live, non-binding range as you type. A real engineer sends the firm number within one business day.</p>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:24px;align-items:start">
+
+      <form onSubmit="{{ submitQuote }}" style="display:flex;flex-direction:column;gap:22px;padding:clamp(24px,3vw,38px);border:1px solid rgba(255,255,255,.1);background:#131415">
+        <div>
+          <label for="qfile" style="display:block;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:#00BFFF;margin-bottom:10px">01 · Your files</label>
+          <label for="qfile" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:34px 20px;border:1px dashed rgba(0,191,255,.4);background:rgba(0,191,255,.04);cursor:pointer;text-align:center" style-hover="background:rgba(0,191,255,.09);border-color:#00BFFF">
+            <span style="font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:16px;color:#F5F5F5">{{ fileLabel }}</span>
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:#8E969B">STL · STEP · OBJ · 3MF · sketch — 100 MB max</span>
+          </label>
+          <input id="qfile" ref="{{ fileRef }}" type="file" multiple onChange="{{ onFiles }}" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none">
+        </div>
+
+        <div>
+          <label for="qdesc" style="display:block;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:#00BFFF;margin-bottom:10px">02 · Project description</label>
+          <textarea id="qdesc" rows="4" placeholder="What does the part do, what does it mate with, and what has to hold?" style="width:100%;box-sizing:border-box;padding:14px;background:#0E0F10;border:1px solid rgba(255,255,255,.14);color:#F5F5F5;font-size:14.5px;line-height:1.6;resize:vertical"></textarea>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,150px),1fr));gap:16px">
+          <div>
+            <label for="qmat" style="display:block;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:#00BFFF;margin-bottom:10px">03 · Material</label>
+            <select id="qmat" onChange="{{ onMaterial }}" style="width:100%;box-sizing:border-box;padding:13px;background:#0E0F10;border:1px solid rgba(255,255,255,.14);color:#F5F5F5;font-size:14.5px">
+              <option value="PLA">PLA — concept models</option>
+              <option value="PETG">PETG — tough &amp; clear</option>
+              <option value="ABS">ABS — classic engineering</option>
+              <option value="ASA">ASA — UV stable, outdoor</option>
+              <option value="PA12-CF">PA12-CF — nylon carbon fiber</option>
+              <option value="Resin 8K">Resin 8K — fine detail</option>
+              <option value="TPU">TPU — flexible</option>
+            </select>
+          </div>
+          <div>
+            <label for="qsize" style="display:block;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:#00BFFF;margin-bottom:10px">04 · Part size</label>
+            <select id="qsize" onChange="{{ onSize }}" style="width:100%;box-sizing:border-box;padding:13px;background:#0E0F10;border:1px solid rgba(255,255,255,.14);color:#F5F5F5;font-size:14.5px">
+              <option value="palm">Palm — under 80 mm</option>
+              <option value="shoebox">Shoebox — under 250 mm</option>
+              <option value="large">Large — up to 400 mm</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,150px),1fr));gap:16px">
+          <div>
+            <label for="qqty" style="display:block;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:#00BFFF;margin-bottom:10px">05 · Quantity</label>
+            <input id="qqty" type="number" min="1" max="5000" step="1" onInput="{{ onQty }}" placeholder="1" style="width:100%;box-sizing:border-box;padding:13px;background:#0E0F10;border:1px solid rgba(255,255,255,.14);color:#F5F5F5;font-size:14.5px">
+          </div>
+          <div>
+            <label for="qtime" style="display:block;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:#00BFFF;margin-bottom:10px">06 · Timeline</label>
+            <select id="qtime" onChange="{{ onSpeed }}" style="width:100%;box-sizing:border-box;padding:13px;background:#0E0F10;border:1px solid rgba(255,255,255,.14);color:#F5F5F5;font-size:14.5px">
+              <option value="standard">Standard — 3 business days</option>
+              <option value="expedited">Expedited — 2 business days</option>
+              <option value="rush">Rush — 24 hours</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label for="qemail" style="display:block;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:#00BFFF;margin-bottom:10px">07 · Where do we send it</label>
+          <input id="qemail" type="email" required placeholder="you@company.com" style="width:100%;box-sizing:border-box;padding:13px;background:#0E0F10;border:1px solid rgba(255,255,255,.14);color:#F5F5F5;font-size:14.5px">
+        </div>
+
+        <button type="submit" style="padding:18px 24px;background:#FF6B00;border:1px solid #FF6B00;color:#0B0C0D;font-family:'IBM Plex Mono',monospace;font-size:11.5px;font-weight:500;letter-spacing:.22em;text-transform:uppercase;cursor:pointer" style-hover="background:#ff8124;border-color:#ff8124">Send quote request</button>
+      </form>
+
+      <aside style="display:flex;flex-direction:column;gap:20px">
+        <div style="padding:clamp(24px,3vw,34px);border:1px solid rgba(0,191,255,.3);background:linear-gradient(180deg,rgba(0,191,255,.08),rgba(0,191,255,.02))">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.24em;text-transform:uppercase;color:#00BFFF;margin-bottom:22px">Live estimate</div>
+          <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:6px">
+            <span style="font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:clamp(34px,4.6vw,52px);line-height:1;color:#F5F5F5">{{ estLow }}</span>
+            <span style="font-family:'Chakra Petch',sans-serif;font-weight:500;font-size:22px;color:#5E666B">–</span>
+            <span style="font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:clamp(34px,4.6vw,52px);line-height:1;color:#F5F5F5">{{ estHigh }}</span>
+          </div>
+          <p style="margin:0 0 24px;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#8E969B">Non-binding · firm quote by email</p>
+          <dl style="display:grid;grid-template-columns:1fr auto;gap:12px 16px;margin:0;font-size:13.5px;border-top:1px solid rgba(255,255,255,.1);padding-top:20px">
+            <dt style="color:#8E969B">Per unit</dt><dd style="margin:0;text-align:right;font-family:'IBM Plex Mono',monospace;color:#F5F5F5">{{ estUnit }}</dd>
+            <dt style="color:#8E969B">Quantity</dt><dd style="margin:0;text-align:right;font-family:'IBM Plex Mono',monospace;color:#F5F5F5">{{ estQty }}</dd>
+            <dt style="color:#8E969B">Setup &amp; review</dt><dd style="margin:0;text-align:right;font-family:'IBM Plex Mono',monospace;color:#F5F5F5">{{ estSetup }}</dd>
+            <dt style="color:#8E969B">Material</dt><dd style="margin:0;text-align:right;font-family:'IBM Plex Mono',monospace;color:#00BFFF">{{ estMaterial }}</dd>
+            <dt style="color:#8E969B">Ships by</dt><dd style="margin:0;text-align:right;font-family:'IBM Plex Mono',monospace;color:#FF6B00">{{ estShip }}</dd>
+          </dl>
+        </div>
+
+        <div style="padding:clamp(22px,3vw,30px);border:1px solid rgba(255,255,255,.1);background:#131415">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.24em;text-transform:uppercase;color:#FF6B00;margin-bottom:18px">Tolerance FAQ</div>
+          <details style="border-bottom:1px solid rgba(255,255,255,.08);padding:12px 0">
+            <summary style="cursor:pointer;font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:15px;color:#F5F5F5;list-style:none">What tolerance can you actually hold?</summary>
+            <p style="margin:10px 0 0;font-size:13.5px;line-height:1.6;color:#8E969B">Typically ±0.10 mm on FDM features and tighter on resin. Anything critical gets called out on the quote before we print, not after.</p>
+          </details>
+          <details style="border-bottom:1px solid rgba(255,255,255,.08);padding:12px 0">
+            <summary style="cursor:pointer;font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:15px;color:#F5F5F5;list-style:none">Do press-fits and threads come out to size?</summary>
+            <p style="margin:10px 0 0;font-size:13.5px;line-height:1.6;color:#8E969B">Tell us the mating part. We compensate holes and bosses per material shrink, or design in heat-set inserts where threads take load.</p>
+          </details>
+          <details style="padding:12px 0">
+            <summary style="cursor:pointer;font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:15px;color:#F5F5F5;list-style:none">What if the first article is wrong?</summary>
+            <p style="margin:10px 0 0;font-size:13.5px;line-height:1.6;color:#8E969B">Send it back with the measurement. If it missed the tolerance we quoted, the reprint is on us.</p>
+          </details>
+        </div>
+      </aside>
+    </div>
+
+    <div ref="{{ confirmRef }}" style="display:none;margin-top:24px;padding:clamp(26px,4vw,40px);border:1px solid #FF6B00;background:linear-gradient(180deg,rgba(255,107,0,.1),rgba(255,107,0,.02))">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.24em;text-transform:uppercase;color:#FF6B00;margin-bottom:14px">Quote request received</div>
+      <p style="margin:0 0 12px;max-width:66ch;font-family:'Chakra Petch',sans-serif;font-weight:500;font-size:clamp(17px,2vw,21px);line-height:1.45;color:#F5F5F5">Thanks for choosing JR Print Forge. We've received your project details and files.</p>
+      <p style="margin:0;max-width:66ch;font-size:14.5px;line-height:1.65;color:#B4BCC1">Our team will review your requirements and send a custom quote to your email, typically within 1 business day. Standard production turnaround is 3 business days after quote approval. Questions? Contact <a href="mailto:quotes@jrprintforge.com" style="color:#00BFFF">quotes@jrprintforge.com</a>.</p>
+    </div>
+  </div>
+</section>
+
+<footer style="border-top:1px solid rgba(255,255,255,.08);background:#0B0C0D">
+  <div style="max-width:1320px;margin:0 auto;padding:clamp(48px,7vw,84px) clamp(20px,5vw,64px) 30px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:40px">
+    <div>
+      <div style="display:flex;align-items:center;gap:11px;margin-bottom:18px">
+        <img src="uploads/jr-print-forge.jpg" alt="" style="width:40px;height:40px;display:block;border:1px solid rgba(255,255,255,.14)">
+        <span style="font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:16px;letter-spacing:.12em;color:#F5F5F5">JR PRINT FORGE</span>
+      </div>
+      <p style="margin:0;max-width:30ch;font-size:13.5px;line-height:1.65;color:#8E969B">Precision additive manufacturing for engineers, inventors and the people who have to ship.</p>
+    </div>
+    <div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.24em;text-transform:uppercase;color:#5E666B;margin-bottom:16px">Services</div>
+      <div style="display:flex;flex-direction:column;gap:9px;font-size:13.5px">
+        <a href="#services" style="color:#9AA3A8">Rapid Prototyping</a>
+        <a href="#services" style="color:#9AA3A8">Functional Parts</a>
+        <a href="#services" style="color:#9AA3A8">Resin &amp; FDM Printing</a>
+        <a href="#services" style="color:#9AA3A8">CAD Design</a>
+        <a href="#services" style="color:#9AA3A8">Production Runs</a>
+      </div>
+    </div>
+    <div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.24em;text-transform:uppercase;color:#5E666B;margin-bottom:16px">Contact</div>
+      <div style="display:flex;flex-direction:column;gap:9px;font-size:13.5px">
+        <a href="mailto:quotes@jrprintforge.com" style="color:#00BFFF">quotes@jrprintforge.com</a>
+        <a href="Planetary Gearbox.html" style="color:#9AA3A8">3D part viewer</a>
+        <a href="Design Handoff.dc.html" style="color:#9AA3A8">Design handoff</a>
+        <span style="color:#5E666B;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.1em">Mon–Fri · quotes in 1 business day</span>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:18px;font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.16em;text-transform:uppercase">
+        <a href="#" style="padding:7px 11px;border:1px solid rgba(255,255,255,.14);color:#9AA3A8">IG</a>
+        <a href="#" style="padding:7px 11px;border:1px solid rgba(255,255,255,.14);color:#9AA3A8">LI</a>
+        <a href="#" style="padding:7px 11px;border:1px solid rgba(255,255,255,.14);color:#9AA3A8">X</a>
+      </div>
+    </div>
+    <div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.24em;text-transform:uppercase;color:#5E666B;margin-bottom:16px">Start a job</div>
+      <a href="#quote" style="display:inline-flex;align-items:center;gap:10px;padding:15px 22px;background:#FF6B00;color:#0B0C0D;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;border:1px solid #FF6B00" style-hover="background:#ff8124;border-color:#ff8124">Get a Quote →</a>
+    </div>
+  </div>
+  <div style="max-width:1320px;margin:0 auto;padding:22px clamp(20px,5vw,64px) 40px;border-top:1px solid rgba(255,255,255,.06);display:flex;flex-wrap:wrap;gap:12px 26px;justify-content:space-between;font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:#5E666B">
+    <span style="white-space:nowrap">© 2026 JR Print Forge</span>
+    <span>Hero rendered live · <span style="color:#8E969B">{{ backend }}</span></span>
+  </div>
+</footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;maskRadius&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:200,&quot;min&quot;:80,&quot;max&quot;:420,&quot;step&quot;:10,&quot;unit&quot;:&quot;px&quot;,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;PulseMask&quot;},&quot;pulseMask&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;PulseMask&quot;}}">
+class Component extends DCLogic {
+  rootRef = React.createRef();
+  fileRef = React.createRef();
+  confirmRef = React.createRef();
+
+  QUOTES = [
+    { t: 'They caught a wall-thickness problem our CAD reviewer missed, quoted the fix, and still shipped inside the week.', w: 'Mechanical engineer · robotics startup' },
+    { t: 'First run of 240 housings came off dimensionally identical. That is the whole reason we moved the batch here.', w: 'Operations lead · instrumentation OEM' },
+    { t: 'I sent a napkin sketch. I got back a STEP file, a printed prototype, and an honest note about what would fail.', w: 'Independent inventor · consumer hardware' },
+  ];
+  MAT = { 'PLA': 1.0, 'PETG': 1.15, 'ABS': 1.2, 'ASA': 1.3, 'PA12-CF': 2.4, 'Resin 8K': 1.9, 'TPU': 1.6 };
+  SIZE = { palm: 0.4, shoebox: 1.0, large: 2.5 };
+  SPEED = { standard: { m: 1, d: 3 }, expedited: { m: 1.25, d: 2 }, rush: { m: 1.65, d: 1 } };
+
+  state = { backend: 'initializing…', verts: '—', qi: 0, material: 'PLA', size: 'palm', qty: 1, speed: 'standard', fileLabel: 'Drop files here or click to browse' };
+
+  componentDidMount() {
+    this.wire();
+    this._t = setTimeout(() => this.wire(), 700);
+    addEventListener('forge-hero-ready', (e) => this.setState({
+      backend: e.detail.backend,
+      verts: (e.detail.vertices || 0).toLocaleString('en-US'),
+    }));
+    const el = document.querySelector('forge-hero');
+    if (el && el.dataset.backend) {
+      this.setState({
+        backend: el.dataset.backend,
+        verts: Number(el.dataset.vertices || 0).toLocaleString('en-US'),
+      });
+    }
+    setTimeout(() => {
+      const f = document.querySelector('forge-hero');
+      if (f && !f.dataset.backend) this.setState({ backend: 'software fallback' });
+    }, 6000);
+  }
+  componentWillUnmount() { clearTimeout(this._t); }
+  componentDidUpdate(prev) { if (prev.qi !== this.state.qi) this.paintDots(); }
+
+  // ---- PulseMask: one pointer handler writes local coords onto masked nodes
+  wire() {
+    const root = this.rootRef.current || document;
+    const r = this.props.maskRadius ?? 200;
+    const on = this.props.pulseMask !== false;
+    root.querySelectorAll('[data-pm]').forEach((n) => {
+      n.style.setProperty('--pm-r', on ? r + 'px' : '0px');
+      if (n.dataset.pmBound) return;
+      n.dataset.pmBound = '1';
+      const host = n.dataset.pm === 'wipe' || n.dataset.pm === 'reveal' ? n.closest('section, figure, article') || n : n;
+      const targets = [n, ...host.querySelectorAll('[data-pm-layer]')];
+      const move = (e) => {
+        const b = host.getBoundingClientRect();
+        const x = ((e.clientX - b.left) / b.width) * 100, y = ((e.clientY - b.top) / b.height) * 100;
+        targets.forEach((t) => { t.style.setProperty('--mx', x + '%'); t.style.setProperty('--my', y + '%'); });
+        host.style.setProperty('--mx', x + '%'); host.style.setProperty('--my', y + '%');
+      };
+      host.addEventListener('pointermove', move);
+    });
+    // masked layers inside cards: bind on the card itself
+    root.querySelectorAll('[data-pm-layer]').forEach((n) => {
+      n.style.setProperty('--pm-r', on ? r + 'px' : '0px');
+      const host = n.parentElement;
+      if (!host || host.dataset.pmHost) return;
+      host.dataset.pmHost = '1';
+      host.addEventListener('pointermove', (e) => {
+        const b = host.getBoundingClientRect();
+        n.style.setProperty('--mx', ((e.clientX - b.left) / b.width) * 100 + '%');
+        n.style.setProperty('--my', ((e.clientY - b.top) / b.height) * 100 + '%');
+      });
+    });
+
+    root.querySelectorAll('[data-pm-fade]').forEach((n) => {
+      const host = n.parentElement;
+      if (!host || host.dataset.pmFadeBound) return;
+      host.dataset.pmFadeBound = '1';
+      host.addEventListener('pointerenter', () => { if (this.props.pulseMask !== false) n.style.opacity = '1'; });
+      host.addEventListener('pointerleave', () => { n.style.opacity = '0'; });
+    });
+
+    if (this._io) return;
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    this._io = new IntersectionObserver((entries) => {
+      entries.forEach((en) => {
+        if (!en.isIntersecting) return;
+        const el = en.target;
+        el.style.opacity = '1';
+        el.style.transform = 'none';
+        el.querySelectorAll('[data-step-bar]').forEach((b) => { b.style.width = '100%'; });
+        el.querySelectorAll('[data-count]').forEach((c) => this.count(c));
+        this._io.unobserve(el);
+      });
+    }, { threshold: 0.18, rootMargin: '0px 0px -8% 0px' });
+    root.querySelectorAll('[data-reveal]').forEach((el, i) => {
+      if (el.dataset.revealBound) return;
+      el.dataset.revealBound = '1';
+      if (!reduce) {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(18px)';
+        el.style.transition = `opacity .7s cubic-bezier(.2,.7,.2,1) ${(i % 6) * 55}ms, transform .7s cubic-bezier(.2,.7,.2,1) ${(i % 6) * 55}ms`;
+      }
+      this._io.observe(el);
+    });
+  }
+
+  count(node) {
+    const target = parseFloat(node.dataset.count), dec = parseInt(node.dataset.dec || '0', 10);
+    if (!isFinite(target)) return;
+    const dur = 1100, t0 = performance.now();
+    const step = (t) => {
+      const p = Math.min((t - t0) / dur, 1);
+      const e = 1 - Math.pow(1 - p, 3);
+      node.textContent = (target * e).toFixed(dec);
+      if (p < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }
+
+  paintDots() {
+    (this.rootRef.current || document).querySelectorAll('[data-dot]').forEach((d) => {
+      d.style.background = +d.dataset.dot === this.state.qi ? '#FF6B00' : 'rgba(255,255,255,.18)';
+    });
+  }
+
+  // ---- estimate ---------------------------------------------------------
+  calc() {
+    const qty = Math.max(1, Math.min(5000, this.state.qty || 1));
+    const unitBase = 42 * (this.MAT[this.state.material] || 1) * (this.SIZE[this.state.size] || 1);
+    const disc = qty >= 100 ? 0.6 : qty >= 20 ? 0.74 : qty >= 5 ? 0.88 : 1;
+    const sp = this.SPEED[this.state.speed] || this.SPEED.standard;
+    const unit = unitBase * disc * sp.m;
+    const total = unit * qty + 65;
+    const money = (n) => '$' + Math.round(n).toLocaleString('en-US');
+    const ship = new Date();
+    let added = 0;
+    while (added < sp.d + 1) { ship.setDate(ship.getDate() + 1); if (ship.getDay() !== 0 && ship.getDay() !== 6) added++; }
+    return {
+      unit: money(unit), qty: String(qty), setup: money(65),
+      low: money(total * 0.88), high: money(total * 1.16),
+      ship: ship.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+    };
+  }
+
+  renderVals() {
+    const q = this.QUOTES[this.state.qi];
+    const e = this.calc();
+    return {
+      rootRef: this.rootRef, fileRef: this.fileRef, confirmRef: this.confirmRef,
+      backend: this.state.backend, verts: this.state.verts,
+      quoteText: '“' + q.t + '”', quoteWho: q.w,
+      fileLabel: this.state.fileLabel,
+      estUnit: e.unit, estQty: e.qty, estSetup: e.setup, estLow: e.low, estHigh: e.high,
+      estMaterial: this.state.material, estShip: e.ship,
+      prevQuote: () => this.setState((s) => ({ qi: (s.qi + this.QUOTES.length - 1) % this.QUOTES.length })),
+      nextQuote: () => this.setState((s) => ({ qi: (s.qi + 1) % this.QUOTES.length })),
+      onMaterial: (ev) => this.setState({ material: ev.target.value }),
+      onSize: (ev) => this.setState({ size: ev.target.value }),
+      onSpeed: (ev) => this.setState({ speed: ev.target.value }),
+      onQty: (ev) => this.setState({ qty: parseInt(ev.target.value || '1', 10) || 1 }),
+      onFiles: (ev) => {
+        const f = [...(ev.target.files || [])];
+        this.setState({ fileLabel: f.length ? f.length + ' file' + (f.length > 1 ? 's' : '') + ' attached · ' + f[0].name : 'Drop files here or click to browse' });
+      },
+      focusUpload: () => setTimeout(() => this.fileRef.current && this.fileRef.current.click(), 450),
+      submitQuote: (ev) => {
+        ev.preventDefault();
+        const c = this.confirmRef.current;
+        if (!c) return;
+        c.style.display = 'block';
+        c.scrollTop = 0;
+        window.scrollTo({ top: c.getBoundingClientRect().top + window.scrollY - 120, behavior: 'smooth' });
+      },
+    };
+  }
+}
+</script>
+</body>
+</html>

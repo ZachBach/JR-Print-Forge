@@ -1,0 +1,19 @@
+node_modules/
+.next/
+out/
+build/
+next-env.d.ts
+*.tsbuildinfo
+
+.env
+.env.local
+.env.*.local
+
+.DS_Store
+*.log
+npm-debug.log*
+
+# Test exports downloaded from the /gearbox viewer while developing — not source.
+/jr-planetary-gearbox.obj
+/jr-planetary-gearbox.mtl
+/components/jr-planetary-gearbox.glb

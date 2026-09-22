@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="description" content="JR Print Forge — design strategy, component architecture, animation specs and PulseMask integration plan.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  html{scroll-behavior:smooth}
+  body{margin:0;background:#0B0C0D;color:#B4BCC1;font-family:'IBM Plex Sans',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  ::selection{background:#FF6B00;color:#0B0C0D}
+  a{color:#00BFFF;text-decoration:none}
+  a:hover{color:#FF6B00}
+</style>
+</helmet>
+
+<div style="background:#0B0C0D">
+
+<header style="position:sticky;top:0;z-index:40;display:flex;align-items:center;justify-content:space-between;gap:20px;padding:12px clamp(16px,4vw,44px);background:rgba(11,12,13,.88);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid rgba(255,255,255,.08)">
+  <a href="JR Print Forge.dc.html" style="display:flex;align-items:center;gap:11px">
+    <img src="uploads/jr-print-forge.jpg" alt="JR Print Forge" style="width:32px;height:32px;display:block;border:1px solid rgba(255,255,255,.14)">
+    <span style="display:flex;flex-direction:column;line-height:1">
+      <span style="font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:14px;letter-spacing:.14em;color:#F5F5F5">JR PRINT FORGE</span>
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:.32em;color:#6E777C;margin-top:4px">DESIGN HANDOFF · v1</span>
+    </span>
+  </a>
+  <nav style="display:flex;flex-wrap:wrap;gap:18px;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.16em;text-transform:uppercase">
+    <a href="#strategy" style="color:#9AA3A8">Strategy</a>
+    <a href="#system" style="color:#9AA3A8">System</a>
+    <a href="#arch" style="color:#9AA3A8">Architecture</a>
+    <a href="#motion" style="color:#9AA3A8">Motion</a>
+    <a href="#pulsemask" style="color:#9AA3A8">PulseMask</a>
+    <a href="JR Print Forge.dc.html" style="color:#FF6B00">← Live site</a>
+  </nav>
+</header>
+
+<main style="max-width:920px;margin:0 auto;padding:clamp(52px,8vw,104px) clamp(20px,5vw,48px) 100px">
+
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:22px">
+    <span style="width:7px;height:7px;background:#FF6B00;box-shadow:0 0 14px #FF6B00;flex:none"></span>
+    <span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.3em;text-transform:uppercase;color:#9AA3A8">Design strategy &amp; developer handoff</span>
+  </div>
+  <h1 style="margin:0 0 20px;max-width:24ch;font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:clamp(34px,5.4vw,60px);line-height:1.02;letter-spacing:-.02em;color:#F5F5F5;text-wrap:balance">Everything behind the forge.</h1>
+  <p style="margin:0 0 14px;max-width:62ch;font-size:clamp(16px,1.6vw,18.5px);line-height:1.68;color:#B4BCC1">The live pages are the specification — this document says why they look the way they do, and what a Next.js team needs to rebuild them without guessing.</p>
+  <p style="margin:0;max-width:62ch;font-size:14px;line-height:1.7;color:#8E969B">Two deliverables ship alongside it: <a href="JR Print Forge.dc.html">the homepage</a>, and <a href="Planetary Gearbox.html">the 3D part viewer</a> with OBJ + GLB export.</p>
+
+  <hr style="border:0;height:1px;margin:56px 0;background:linear-gradient(90deg,rgba(0,191,255,.35),rgba(255,107,0,.2),transparent)">
+
+  <section id="strategy">
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.3em;text-transform:uppercase;color:#00BFFF;margin-bottom:14px">01 — Strategy</div>
+    <h2 style="margin:0 0 18px;font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:clamp(26px,3.4vw,38px);line-height:1.08;letter-spacing:-.015em;color:#F5F5F5">Proof, not adjectives.</h2>
+    <p style="margin:0 0 16px;max-width:64ch;font-size:15.5px;line-height:1.72">Engineers do not buy "premium quality." They buy a tolerance, a lead time, a material name, and evidence that someone competent looked at their file. Every section on the homepage is therefore built to answer one buying question, in order, and each one hands the visitor a number they can check.</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:1px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.08);margin:26px 0">
+      <div style="padding:24px 22px;background:#131415">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:#00BFFF;margin-bottom:10px">Positioning</div>
+        <p style="margin:0;font-size:14px;line-height:1.65;color:#8E969B">A machine shop that thinks in additive — engineering review included, not a print farm with an upload box.</p>
+      </div>
+      <div style="padding:24px 22px;background:#131415">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:#00BFFF;margin-bottom:10px">Primary conversion</div>
+        <p style="margin:0;font-size:14px;line-height:1.65;color:#8E969B">Quote request with files attached. Every section terminates in a path to it; the estimator removes the price unknown before the form is filled.</p>
+      </div>
+      <div style="padding:24px 22px;background:#131415">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:#00BFFF;margin-bottom:10px">Proof surface</div>
+        <p style="margin:0;font-size:14px;line-height:1.65;color:#8E969B">The hero is a live WebGPU render, not stock art. It demonstrates capability in the medium the company sells.</p>
+      </div>
+    </div>
+    <p style="margin:0;max-width:64ch;font-size:14px;line-height:1.7;color:#8E969B"><strong style="color:#F5F5F5;font-weight:600">Figures to replace before launch:</strong> ±0.10 mm tolerance, 12 materials, 100% inspected, $65 setup, and the three testimonials. One business day to quote and three business days to produce are yours and already accurate.</p>
+  </section>
+
+  <hr style="border:0;height:1px;margin:56px 0;background:linear-gradient(90deg,rgba(0,191,255,.35),rgba(255,107,0,.2),transparent)">
+
+  <section id="system">
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.3em;text-transform:uppercase;color:#00BFFF;margin-bottom:14px">02 — Visual system</div>
+    <h2 style="margin:0 0 18px;font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:clamp(26px,3.4vw,38px);line-height:1.08;letter-spacing:-.015em;color:#F5F5F5">Instrument panel, not brochure.</h2>
+    <p style="margin:0 0 24px;max-width:64ch;font-size:15.5px;line-height:1.72">Hairline borders at 8% white, square corners, mono labels in wide tracking, and exactly two accent colors. Blue carries information and interaction; orange carries heat and action. Nothing else gets a color.</p>
+
+    <div style="overflow-x:auto;margin:0 0 28px">
+      <table style="width:100%;border-collapse:collapse;font-size:13.5px">
+        <thead><tr>
+          <th style="text-align:left;padding:10px 12px;border-bottom:1px solid rgba(0,191,255,.3);font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:#00BFFF">Token</th>
+          <th style="text-align:left;padding:10px 12px;border-bottom:1px solid rgba(0,191,255,.3);font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:#00BFFF">Value</th>
+          <th style="text-align:left;padding:10px 12px;border-bottom:1px solid rgba(0,191,255,.3);font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:#00BFFF">Use</th>
+        </tr></thead>
+        <tbody style="font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:#9AA3A8">
+          <tr><td style="padding:9px 12px;border-bottom:1px solid rgba(255,255,255,.06);color:#F5F5F5">ground</td><td style="padding:9px 12px;border-bottom:1px solid rgba(255,255,255,.06)">#0B0C0D</td><td style="padding:9px 12px;border-bottom:1px solid rgba(255,255,255,.06)">page base, footer</td></tr>
+          <tr><td style="padding:9px 12px;border-bottom:1px solid rgba(255,255,255,.06);color:#F5F5F5">graphite</td><td style="padding:9px 12px;border-bottom:1px solid rgba(255,255,255,.06)">#1A1A1A → #131415</td><td style="padding:9px 12px;border-bottom:1px solid rgba(255,255,255,.06)">cards, panels</td></tr>
+          <tr><td style="padding:9px 12px;border-bottom:1px solid rgba(255,255,255,.06);color:#F5F5F5">charcoal</td><td style="padding:9px 12px;border-bottom:1px solid rgba(255,255,255,.06)">#252525</td><td style="padding:9px 12px;border-bottom:1px solid rgba(255,255,255,.06)">raised surfaces, hover</td></tr>
+          <tr><td style="padding:9px 12px;border-bottom:1px solid rgba(255,255,255,.06);color:#00BFFF">blue</td><td style="padding:9px 12px;border-bottom:1px solid rgba(255,255,255,.06)">#00BFFF</td><td style="padding:9px 12px;border-bottom:1px solid rgba(255,255,255,.06)">labels, data, links, masks</td></tr>
+          <tr><td style="padding:9px 12px;border-bottom:1px solid rgba(255,255,255,.06);color:#FF6B00">ember</td><td style="padding:9px 12px;border-bottom:1px solid rgba(255,255,255,.06)">#FF6B00</td><td style="padding:9px 12px;border-bottom:1px solid rgba(255,255,255,.06)">primary CTA, heat, step index</td></tr>
+          <tr><td style="padding:9px 12px;border-bottom:1px solid rgba(255,255,255,.06);color:#F5F5F5">ink / body / dim</td><td style="padding:9px 12px;border-bottom:1px solid rgba(255,255,255,.06)">#F5F5F5 / #8E969B / #5E666B</td><td style="padding:9px 12px;border-bottom:1px solid rgba(255,255,255,.06)">headings / prose / meta</td></tr>
+          <tr><td style="padding:9px 12px;color:#F5F5F5">hairline</td><td style="padding:9px 12px">rgba(255,255,255,.08)</td><td style="padding:9px 12px">every border on the page</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 style="margin:0 0 10px;font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:18px;color:#F5F5F5">Type</h3>
+    <p style="margin:0 0 20px;max-width:64ch;font-size:14.5px;line-height:1.7;color:#8E969B"><strong style="color:#F5F5F5;font-weight:600">Chakra Petch</strong> 600/700 for headings and numbers — squared terminals read as machined. <strong style="color:#F5F5F5;font-weight:600">IBM Plex Sans</strong> 400/500 for prose. <strong style="color:#F5F5F5;font-weight:600">IBM Plex Mono</strong> for every label, spec chip, readout and eyebrow, always uppercase at 9.5–11px with .16–.30em tracking. Headlines clamp from 30px to 84px; body never below 13.5px.</p>
+
+    <h3 style="margin:0 0 10px;font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:18px;color:#F5F5F5">Visual hierarchy, per section</h3>
+    <p style="margin:0;max-width:64ch;font-size:14.5px;line-height:1.7;color:#8E969B">Mono eyebrow with an index (01 —) → Chakra headline at clamp(30px, 4vw, 52px) → one 34ch support line → the content grid. Grids are 1px-gap hairline lattices on a rgba(255,255,255,.08) background, so the dividers are the background showing through rather than borders that double up.</p>
+  </section>
+
+  <hr style="border:0;height:1px;margin:56px 0;background:linear-gradient(90deg,rgba(0,191,255,.35),rgba(255,107,0,.2),transparent)">
+
+  <section id="arch">
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.3em;text-transform:uppercase;color:#00BFFF;margin-bottom:14px">03 — Component architecture</div>
+    <h2 style="margin:0 0 18px;font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:clamp(26px,3.4vw,38px);line-height:1.08;letter-spacing:-.015em;color:#F5F5F5">Next.js App Router tree.</h2>
+    <pre style="margin:0 0 26px;padding:20px 22px;overflow-x:auto;border:1px solid rgba(255,255,255,.08);background:#0E0F10;font-family:'IBM Plex Mono',monospace;font-size:12.5px;line-height:1.75;color:#9AA3A8">app/
+  layout.tsx            fonts, metadata, JSON-LD, skip link
+  page.tsx              composes the eight sections, server component
+  quote/actions.ts      server action: upload + email the request
+components/
+  Header.tsx            sticky nav, mono links, ember CTA
+  hero/
+    Hero.tsx            copy, CTAs, readout strip (client)
+    ForgeStage.tsx      dynamic(ssr:false) wrapper around the WebGPU scene
+    forge/              scene.ts · materials.ts · flame.ts · wordmark.ts
+  PulseSurface.tsx      cursor-mask primitive — mode="wipe" | "reveal"
+  ServiceCard.tsx       index, title, blurb, spec chips
+  ProcessRail.tsx       four steps, scroll-driven progress bars
+  WorkTile.tsx          image + CAD overlay burned away by the cursor
+  StatCell.tsx          count-up on first intersection
+  Testimonials.tsx      client: index state, prev/next, mask sweep
+  quote/
+    QuoteForm.tsx       client form, react-hook-form + zod
+    Estimator.tsx       pure pricing fn + live panel
+    ToleranceFaq.tsx    details/summary, no JS
+  Footer.tsx
+lib/
+  pricing.ts            MATERIAL, SIZE, SPEED tables + estimate()
+  businessDays.ts       ship-by date math
+  motion.ts             shared variants and transitions</pre>
+    <p style="margin:0 0 14px;max-width:64ch;font-size:14.5px;line-height:1.7;color:#8E969B">Only six components need <code style="font-family:'IBM Plex Mono',monospace;font-size:.88em;color:#00BFFF;background:rgba(0,191,255,.07);padding:2px 6px">"use client"</code>: ForgeStage, PulseSurface, ProcessRail, StatCell, Testimonials, QuoteForm. Everything else renders on the server, which is what keeps the first paint fast despite the 3D hero.</p>
+    <p style="margin:0;max-width:64ch;font-size:14.5px;line-height:1.7;color:#8E969B"><strong style="color:#F5F5F5;font-weight:600">Pricing is a pure function.</strong> <code style="font-family:'IBM Plex Mono',monospace;font-size:.88em;color:#00BFFF;background:rgba(0,191,255,.07);padding:2px 6px">estimate(input)</code> returns unit, setup, low, high and shipBy from the same tables the server action uses, so the number in the panel and the number in the email can never drift.</p>
+  </section>
+
+  <hr style="border:0;height:1px;margin:56px 0;background:linear-gradient(90deg,rgba(0,191,255,.35),rgba(255,107,0,.2),transparent)">
+
+  <section id="wireframe">
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.3em;text-transform:uppercase;color:#00BFFF;margin-bottom:14px">04 — Page wireframe</div>
+    <h2 style="margin:0 0 18px;font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:clamp(26px,3.4vw,38px);line-height:1.08;letter-spacing:-.015em;color:#F5F5F5">Eight blocks, one job each.</h2>
+    <div style="display:flex;flex-direction:column;gap:1px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.08)">
+      <div style="display:grid;grid-template-columns:52px 1fr;gap:18px;padding:20px 22px;background:#131415;align-items:start">
+        <span style="font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:20px;color:rgba(0,191,255,.5)">01</span>
+        <div><div style="font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:16.5px;color:#F5F5F5;margin-bottom:6px">Hero — 92vh, copy left, forge right</div><p style="margin:0;font-size:13.5px;line-height:1.65;color:#8E969B">Headline, subhead, two CTAs over a live anvil-and-hammer render with the JR wordmark bottom-right. A gradient scrim keeps the left column at 4.5:1 contrast; the cursor burns a hole through the CAD grid. Footer strip prints the real renderer path and vertex count.</p></div>
+      </div>
+      <div style="display:grid;grid-template-columns:52px 1fr;gap:18px;padding:20px 22px;background:#131415;align-items:start">
+        <span style="font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:20px;color:rgba(0,191,255,.5)">02</span>
+        <div><div style="font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:16.5px;color:#F5F5F5;margin-bottom:6px">Services — six cards, auto-fit 290px</div><p style="margin:0;font-size:13.5px;line-height:1.65;color:#8E969B">Each card carries two spec chips so the capability is measurable. Hover fades in a hatch layer masked to the cursor.</p></div>
+      </div>
+      <div style="display:grid;grid-template-columns:52px 1fr;gap:18px;padding:20px 22px;background:#131415;align-items:start">
+        <span style="font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:20px;color:rgba(0,191,255,.5)">03</span>
+        <div><div style="font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:16.5px;color:#F5F5F5;margin-bottom:6px">Process — four steps with durations</div><p style="margin:0;font-size:13.5px;line-height:1.65;color:#8E969B">Scroll-triggered: each cell rises 18px into place and an ember bar wipes across its top edge. Durations are the commitment, in mono ember.</p></div>
+      </div>
+      <div style="display:grid;grid-template-columns:52px 1fr;gap:18px;padding:20px 22px;background:#131415;align-items:start">
+        <span style="font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:20px;color:rgba(0,191,255,.5)">04</span>
+        <div><div style="font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:16.5px;color:#F5F5F5;margin-bottom:6px">Portfolio — four 4:3 tiles</div><p style="margin:0;font-size:13.5px;line-height:1.65;color:#8E969B">Photo underneath, blueprint grid on top, cursor wipes the CAD away — the CAD-to-print transformation as an interaction rather than a claim. Slots are drop targets today; swap for next/image on build.</p></div>
+      </div>
+      <div style="display:grid;grid-template-columns:52px 1fr;gap:18px;padding:20px 22px;background:#131415;align-items:start">
+        <span style="font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:20px;color:rgba(0,191,255,.5)">05</span>
+        <div><div style="font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:16.5px;color:#F5F5F5;margin-bottom:6px">Why — six stat cells, count-up on view</div><p style="margin:0;font-size:13.5px;line-height:1.65;color:#8E969B">Two ember numbers (the promises) and four blue ones (the capabilities). Numbers live in the markup so they are correct with JS disabled.</p></div>
+      </div>
+      <div style="display:grid;grid-template-columns:52px 1fr;gap:18px;padding:20px 22px;background:#131415;align-items:start">
+        <span style="font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:20px;color:rgba(0,191,255,.5)">06</span>
+        <div><div style="font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:16.5px;color:#F5F5F5;margin-bottom:6px">Testimonials — single card, manual advance</div><p style="margin:0;font-size:13.5px;line-height:1.65;color:#8E969B">No autoplay: quotes are read, not watched. A scanline layer sweeps under the cursor; three rules act as position.</p></div>
+      </div>
+      <div style="display:grid;grid-template-columns:52px 1fr;gap:18px;padding:20px 22px;background:#131415;align-items:start">
+        <span style="font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:20px;color:rgba(0,191,255,.5)">07</span>
+        <div><div style="font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:16.5px;color:#F5F5F5;margin-bottom:6px">Quote — form left, live estimate right</div><p style="margin:0;font-size:13.5px;line-height:1.65;color:#8E969B">Seven numbered fields; the estimate panel updates on every change and states plainly that it is non-binding. Tolerance FAQ sits beside it to kill the last objection. Submit reveals your confirmation copy verbatim.</p></div>
+      </div>
+      <div style="display:grid;grid-template-columns:52px 1fr;gap:18px;padding:20px 22px;background:#131415;align-items:start">
+        <span style="font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:20px;color:rgba(0,191,255,.5)">08</span>
+        <div><div style="font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:16.5px;color:#F5F5F5;margin-bottom:6px">Footer — contact, services, social, CTA</div><p style="margin:0;font-size:13.5px;line-height:1.65;color:#8E969B">Ends on the renderer path, which is the same honesty the rest of the page trades on.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <hr style="border:0;height:1px;margin:56px 0;background:linear-gradient(90deg,rgba(0,191,255,.35),rgba(255,107,0,.2),transparent)">
+
+  <section id="motion">
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.3em;text-transform:uppercase;color:#00BFFF;margin-bottom:14px">05 — Animation specification</div>
+    <h2 style="margin:0 0 18px;font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:clamp(26px,3.4vw,38px);line-height:1.08;letter-spacing:-.015em;color:#F5F5F5">Machined, not bouncy.</h2>
+    <p style="margin:0 0 24px;max-width:64ch;font-size:15.5px;line-height:1.72">One easing curve for entrances — <code style="font-family:'IBM Plex Mono',monospace;font-size:.88em;color:#00BFFF;background:rgba(0,191,255,.07);padding:2px 6px">cubic-bezier(.2,.7,.2,1)</code> — no overshoot, no spring. Nothing animates twice, nothing animates on scroll-out, and every effect below is gated on <code style="font-family:'IBM Plex Mono',monospace;font-size:.88em;color:#00BFFF;background:rgba(0,191,255,.07);padding:2px 6px">prefers-reduced-motion</code>.</p>
+    <div style="overflow-x:auto;margin:0 0 26px">
+      <table style="width:100%;border-collapse:collapse;font-size:13px">
+        <thead><tr>
+          <th style="text-align:left;padding:10px 12px;border-bottom:1px solid rgba(0,191,255,.3);font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:#00BFFF">Element</th>
+          <th style="text-align:left;padding:10px 12px;border-bottom:1px solid rgba(0,191,255,.3);font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:#00BFFF">Trigger</th>
+          <th style="text-align:left;padding:10px 12px;border-bottom:1px solid rgba(0,191,255,.3);font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:#00BFFF">Motion</th>
+          <th style="text-align:left;padding:10px 12px;border-bottom:1px solid rgba(0,191,255,.3);font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:#00BFFF">Timing</th>
+        </tr></thead>
+        <tbody style="color:#9AA3A8">
+          <tr><td style="padding:9px 12px;border-bottom:1px solid rgba(255,255,255,.06);color:#F5F5F5">Cards, tiles, stats</td><td style="padding:9px 12px;border-bottom:1px solid rgba(255,255,255,.06)">18% in view, once</td><td style="padding:9px 12px;border-bottom:1px solid rgba(255,255,255,.06)">opacity 0→1, y 18→0</td><td style="padding:9px 12px;border-bottom:1px solid rgba(255,255,255,.06);font-family:'IBM Plex Mono',monospace;font-size:12px">700ms, 55ms stagger</td></tr>
+          <tr><td style="padding:9px 12px;border-bottom:1px solid rgba(255,255,255,.06);color:#F5F5F5">Process bar</td><td style="padding:9px 12px;border-bottom:1px solid rgba(255,255,255,.06)">cell enters</td><td style="padding:9px 12px;border-bottom:1px solid rgba(255,255,255,.06)">width 0→100%</td><td style="padding:9px 12px;border-bottom:1px solid rgba(255,255,255,.06);font-family:'IBM Plex Mono',monospace;font-size:12px">900ms</td></tr>
+          <tr><td style="padding:9px 12px;border-bottom:1px solid rgba(255,255,255,.06);color:#F5F5F5">Stat numbers</td><td style="padding:9px 12px;border-bottom:1px solid rgba(255,255,255,.06)">cell enters</td><td style="padding:9px 12px;border-bottom:1px solid rgba(255,255,255,.06)">count 0→value, easeOutCubic</td><td style="padding:9px 12px;border-bottom:1px solid rgba(255,255,255,.06);font-family:'IBM Plex Mono',monospace;font-size:12px">1100ms</td></tr>
+          <tr><td style="padding:9px 12px;border-bottom:1px solid rgba(255,255,255,.06);color:#F5F5F5">Mask layers</td><td style="padding:9px 12px;border-bottom:1px solid rgba(255,255,255,.06)">pointermove / enter</td><td style="padding:9px 12px;border-bottom:1px solid rgba(255,255,255,.06)">CSS var write, opacity 0→1</td><td style="padding:9px 12px;border-bottom:1px solid rgba(255,255,255,.06);font-family:'IBM Plex Mono',monospace;font-size:12px">280ms fade, no lag on move</td></tr>
+          <tr><td style="padding:9px 12px;border-bottom:1px solid rgba(255,255,255,.06);color:#F5F5F5">Hammer</td><td style="padding:9px 12px;border-bottom:1px solid rgba(255,255,255,.06)">always (GPU clock)</td><td style="padding:9px 12px;border-bottom:1px solid rgba(255,255,255,.06)">raise ease-in-out, fall pow 1.7, rebound</td><td style="padding:9px 12px;border-bottom:1px solid rgba(255,255,255,.06);font-family:'IBM Plex Mono',monospace;font-size:12px">1.7s cycle · 35 strikes/min</td></tr>
+          <tr><td style="padding:9px 12px;border-bottom:1px solid rgba(255,255,255,.06);color:#F5F5F5">Strike shock</td><td style="padding:9px 12px;border-bottom:1px solid rgba(255,255,255,.06)">impact</td><td style="padding:9px 12px;border-bottom:1px solid rgba(255,255,255,.06)">64 sparks, light flare, wordmark ripple</td><td style="padding:9px 12px;border-bottom:1px solid rgba(255,255,255,.06);font-family:'IBM Plex Mono',monospace;font-size:12px">900ms decay</td></tr>
+          <tr><td style="padding:9px 12px;color:#F5F5F5">Camera</td><td style="padding:9px 12px">pointer in hero</td><td style="padding:9px 12px">orbit ±0.22rad, lerp 0.05/frame</td><td style="padding:9px 12px;font-family:'IBM Plex Mono',monospace;font-size:12px">continuous, 0.11Hz idle drift</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 style="margin:0 0 12px;font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:18px;color:#F5F5F5">Framer Motion implementation</h3>
+    <pre style="margin:0 0 20px;padding:20px 22px;overflow-x:auto;border:1px solid rgba(255,255,255,.08);background:#0E0F10;font-family:'IBM Plex Mono',monospace;font-size:12.5px;line-height:1.75;color:#9AA3A8">// lib/motion.ts
+export const EASE = [0.2, 0.7, 0.2, 1] as const;
+
+export const riseIn &#61; {
+  hidden: { opacity: 0, y: 18 },
+  show:   { opacity: 1, y: 0, transition: { duration: 0.7, ease: EASE } },
+};
+
+export const lattice = {
+  show: { transition: { staggerChildren: 0.055 } },
+};
+
+export const wipeX &#61; {
+  hidden: { scaleX: 0 },
+  show:   { scaleX: 1, transition: { duration: 0.9, ease: EASE } },
+};
+
+// components/ServiceCard.tsx
+&lt;motion.article
+  variants={riseIn}
+  initial="hidden"
+  whileInView&#61;"show"
+  viewport={VIEWPORT}          // once: true, amount: 0.18
+&gt;
+
+// components/ProcessRail.tsx — the ember bar, transformOrigin left
+&lt;motion.span variants={wipeX} style={BAR} /&gt;</pre>
+    <p style="margin:0;max-width:64ch;font-size:14px;line-height:1.7;color:#8E969B">Use <code style="font-family:'IBM Plex Mono',monospace;font-size:.88em;color:#00BFFF;background:rgba(0,191,255,.07);padding:2px 6px">useReducedMotion()</code> at the top of each client component and return the static variant set when it is true. Wrap the mask surfaces in <code style="font-family:'IBM Plex Mono',monospace;font-size:.88em;color:#00BFFF;background:rgba(0,191,255,.07);padding:2px 6px">LazyMotion</code> with the <code style="font-family:'IBM Plex Mono',monospace;font-size:.88em;color:#00BFFF;background:rgba(0,191,255,.07);padding:2px 6px">domAnimation</code> feature bundle — the whole page needs no layout animations, so the full bundle is dead weight.</p>
+  </section>
+
+  <hr style="border:0;height:1px;margin:56px 0;background:linear-gradient(90deg,rgba(0,191,255,.35),rgba(255,107,0,.2),transparent)">
+
+  <section id="pulsemask">
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.3em;text-transform:uppercase;color:#00BFFF;margin-bottom:14px">06 — PulseMask integration</div>
+    <h2 style="margin:0 0 18px;font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:clamp(26px,3.4vw,38px);line-height:1.08;letter-spacing:-.015em;color:#F5F5F5">One primitive, three modes.</h2>
+    <p style="margin:0 0 22px;max-width:64ch;font-size:15.5px;line-height:1.72">The mask is a brand behaviour, not a decoration: the cursor is an inspection light, and what it uncovers is always the real thing under the drawing. Every instance is the same CSS mask driven by two custom properties written from one pointer handler — never React state, so moving the cursor never re-renders a component.</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr));gap:1px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.08);margin:0 0 26px">
+      <div style="padding:22px 20px;background:#131415">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:#FF6B00;margin-bottom:10px">Wipe</div>
+        <p style="margin:0 0 10px;font-size:13.5px;line-height:1.65;color:#8E969B">Overlay is hidden inside the circle. Hero grid, portfolio CAD layer.</p>
+        <code style="display:block;font-family:'IBM Plex Mono',monospace;font-size:11px;line-height:1.6;color:#00BFFF">transparent 0 34%, #000 88%</code>
+      </div>
+      <div style="padding:22px 20px;background:#131415">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:#FF6B00;margin-bottom:10px">Reveal</div>
+        <p style="margin:0 0 10px;font-size:13.5px;line-height:1.65;color:#8E969B">Overlay exists only inside the circle. Service-card scan, testimonial sweep.</p>
+        <code style="display:block;font-family:'IBM Plex Mono',monospace;font-size:11px;line-height:1.6;color:#00BFFF">#000 0 46%, transparent 92%</code>
+      </div>
+      <div style="padding:22px 20px;background:#131415">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:#FF6B00;margin-bottom:10px">Shock</div>
+        <p style="margin:0 0 10px;font-size:13.5px;line-height:1.65;color:#8E969B">The same idea in the shader: a ring expanding from the hammer's impact across the wordmark.</p>
+        <code style="display:block;font-family:'IBM Plex Mono',monospace;font-size:11px;line-height:1.6;color:#00BFFF">smoothstep(.05, 0, |d − t|)</code>
+      </div>
+    </div>
+    <pre style="margin:0 0 20px;padding:20px 22px;overflow-x:auto;border:1px solid rgba(255,255,255,.08);background:#0E0F10;font-family:'IBM Plex Mono',monospace;font-size:12.5px;line-height:1.75;color:#9AA3A8">// components/PulseSurface.tsx  (client)
+const MASK = {
+  wipe:   'radial-gradient(circle var(--pm-r) at var(--mx) var(--my), transparent 0 34%, #000 88%)',
+  reveal: 'radial-gradient(circle var(--pm-r) at var(--mx) var(--my), #000 0 46%, transparent 92%)',
+};
+
+// one rAF-throttled handler per surface; writes vars, never state
+const onMove &#61; (e: React.PointerEvent) =&gt; {
+  const b = e.currentTarget.getBoundingClientRect();
+  const el = e.currentTarget as HTMLElement;
+  el.style.setProperty('--mx', `${((e.clientX - b.left) / b.width) * 100}%`);
+  el.style.setProperty('--my', `${((e.clientY - b.top) / b.height) * 100}%`);
+};</pre>
+    <p style="margin:0 0 14px;max-width:64ch;font-size:14px;line-height:1.7;color:#8E969B"><strong style="color:#F5F5F5;font-weight:600">Touch and keyboard.</strong> With no pointer there is no spotlight, so the default variable values (72% / 46%, radius 200px) must leave a composition that reads on its own — on coarse pointers the overlay drops to 55% opacity and stays static. The reveal is never the only way to reach information.</p>
+    <p style="margin:0;max-width:64ch;font-size:14px;line-height:1.7;color:#8E969B"><strong style="color:#F5F5F5;font-weight:600">Radius and kill switch.</strong> Both are exposed as tweaks on the live homepage (mask radius 80–420px, PulseMask on/off) — keep them as props in the rebuild so the effect can be tuned or disabled per section without a code change.</p>
+  </section>
+
+  <hr style="border:0;height:1px;margin:56px 0;background:linear-gradient(90deg,rgba(0,191,255,.35),rgba(255,107,0,.2),transparent)">
+
+  <section id="stage">
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.3em;text-transform:uppercase;color:#00BFFF;margin-bottom:14px">07 — The forge stage</div>
+    <h2 style="margin:0 0 18px;font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:clamp(26px,3.4vw,38px);line-height:1.08;letter-spacing:-.015em;color:#F5F5F5">WebGPU, TSL, and an honest readout.</h2>
+    <p style="margin:0 0 20px;max-width:64ch;font-size:15.5px;line-height:1.72">three.js r184 <code style="font-family:'IBM Plex Mono',monospace;font-size:.88em;color:#00BFFF;background:rgba(0,191,255,.07);padding:2px 6px">WebGPURenderer</code>, loaded by absolute URL so TSL comes from the same module instance — a second copy of three in one page is the thing never to do. Geometry is built with geo-lib (revolve, tube, roundedBox); every surface is a TSL node material composed from tsl-lib (fbm, warp, stripes, ramp, fireRamp, fresnel, horizonBand), with brand colors coming only from a palette module, never a hex literal in material code.</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr));gap:1px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.08);margin:0 0 24px">
+      <div style="padding:20px;background:#131415"><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.2em;color:#00BFFF;margin-bottom:8px">FLAME</div><p style="margin:0;font-size:13.5px;line-height:1.6;color:#8E969B">Single-pass volumetric raymarch: 26 steps through an AABB, height-sheared fbm for density, emission integrated front-to-back with Beer–Lambert absorption, coloured by fireRamp.</p></div>
+      <div style="padding:20px;background:#131415"><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.2em;color:#00BFFF;margin-bottom:8px">WORDMARK</div><p style="margin:0;font-size:13.5px;line-height:1.6;color:#8E969B">Slab J and R as bezier shapes, extruded and bevelled, then midpoint-subdivided to ~100k vertices so the vertex stage can carry molten swell and the strike ripple.</p></div>
+      <div style="padding:20px;background:#131415"><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.2em;color:#00BFFF;margin-bottom:8px">FRAMING</div><p style="margin:0;font-size:13.5px;line-height:1.6;color:#8E969B">The camera renders a window onto a larger virtual frame via setViewOffset, so the rig lands in the right third at any aspect and clears the readout strip — no lookAt guesswork.</p></div>
+      <div style="padding:20px;background:#131415"><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.2em;color:#00BFFF;margin-bottom:8px">BUDGET</div><p style="margin:0;font-size:13.5px;line-height:1.6;color:#8E969B">Paused when off-screen, pixel ratio capped at 2, reduced-motion freezes the swing. No WebGPU adapter falls back to the WebGL2 backend; a failed boot degrades to a CSS gradient and the strip says so.</p></div>
+    </div>
+    <p style="margin:0;max-width:64ch;font-size:14px;line-height:1.7;color:#8E969B">In Next.js, mount it with <code style="font-family:'IBM Plex Mono',monospace;font-size:.88em;color:#00BFFF;background:rgba(0,191,255,.07);padding:2px 6px">dynamic(() =&gt; import('./forge/Stage'), &#123; ssr: false &#125;)</code> behind an <code style="font-family:'IBM Plex Mono',monospace;font-size:.88em;color:#00BFFF;background:rgba(0,191,255,.07);padding:2px 6px">IntersectionObserver</code>, so the ~600KB of three never touches the critical path and LCP stays the headline.</p>
+  </section>
+
+  <hr style="border:0;height:1px;margin:56px 0;background:linear-gradient(90deg,rgba(0,191,255,.35),rgba(255,107,0,.2),transparent)">
+
+  <section id="tailwind">
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.3em;text-transform:uppercase;color:#00BFFF;margin-bottom:14px">08 — Tailwind mapping</div>
+    <h2 style="margin:0 0 18px;font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:clamp(26px,3.4vw,38px);line-height:1.08;letter-spacing:-.015em;color:#F5F5F5">Tokens first, then five recipes.</h2>
+    <pre style="margin:0 0 22px;padding:20px 22px;overflow-x:auto;border:1px solid rgba(255,255,255,.08);background:#0E0F10;font-family:'IBM Plex Mono',monospace;font-size:12.5px;line-height:1.75;color:#9AA3A8">/* globals.css — Tailwind v4 */
+@theme &#123;
+  --color-ground:   #0B0C0D;
+  --color-panel:    #131415;
+  --color-charcoal: #252525;
+  --color-blue:     #00BFFF;
+  --color-ember:    #FF6B00;
+  --color-ink:      #F5F5F5;
+  --color-body:     #8E969B;
+  --color-dim:      #5E666B;
+  --color-hairline: rgb(255 255 255 / 8%);
+  --font-display:   'Chakra Petch', sans-serif;
+  --font-sans:      'IBM Plex Sans', system-ui, sans-serif;
+  --font-mono:      'IBM Plex Mono', ui-monospace, monospace;
+  --ease-forge:     cubic-bezier(.2,.7,.2,1);
+&#125;</pre>
+    <div style="overflow-x:auto;margin:0 0 20px">
+      <table style="width:100%;border-collapse:collapse;font-size:12.5px">
+        <thead><tr>
+          <th style="text-align:left;padding:10px 12px;border-bottom:1px solid rgba(0,191,255,.3);font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:#00BFFF">Recipe</th>
+          <th style="text-align:left;padding:10px 12px;border-bottom:1px solid rgba(0,191,255,.3);font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:#00BFFF">Classes</th>
+        </tr></thead>
+        <tbody style="font-family:'IBM Plex Mono',monospace;color:#9AA3A8">
+          <tr><td style="padding:9px 12px;border-bottom:1px solid rgba(255,255,255,.06);color:#F5F5F5;white-space:nowrap">eyebrow</td><td style="padding:9px 12px;border-bottom:1px solid rgba(255,255,255,.06)">font-mono text-[10px] uppercase tracking-[.3em] text-blue</td></tr>
+          <tr><td style="padding:9px 12px;border-bottom:1px solid rgba(255,255,255,.06);color:#F5F5F5;white-space:nowrap">section</td><td style="padding:9px 12px;border-bottom:1px solid rgba(255,255,255,.06)">mx-auto max-w-[1320px] px-5 sm:px-10 lg:px-16 py-18 lg:py-35</td></tr>
+          <tr><td style="padding:9px 12px;border-bottom:1px solid rgba(255,255,255,.06);color:#F5F5F5;white-space:nowrap">headline</td><td style="padding:9px 12px;border-bottom:1px solid rgba(255,255,255,.06)">font-display font-semibold text-3xl lg:text-5xl leading-[1.04] tracking-[-.015em] text-ink text-pretty</td></tr>
+          <tr><td style="padding:9px 12px;border-bottom:1px solid rgba(255,255,255,.06);color:#F5F5F5;white-space:nowrap">lattice</td><td style="padding:9px 12px;border-bottom:1px solid rgba(255,255,255,.06)">grid gap-px bg-hairline border border-hairline [grid-template-columns:repeat(auto-fit,minmax(min(100%,290px),1fr))]</td></tr>
+          <tr><td style="padding:9px 12px;border-bottom:1px solid rgba(255,255,255,.06);color:#F5F5F5;white-space:nowrap">card</td><td style="padding:9px 12px;border-bottom:1px solid rgba(255,255,255,.06)">relative overflow-hidden bg-panel p-8 min-h-[270px] transition-colors hover:bg-charcoal</td></tr>
+          <tr><td style="padding:9px 12px;border-bottom:1px solid rgba(255,255,255,.06);color:#F5F5F5;white-space:nowrap">chip</td><td style="padding:9px 12px;border-bottom:1px solid rgba(255,255,255,.06)">font-mono text-[9.5px] uppercase tracking-[.14em] text-blue whitespace-nowrap border border-blue/25 bg-blue/5 px-2.5 py-1.5</td></tr>
+          <tr><td style="padding:9px 12px;color:#F5F5F5;white-space:nowrap">cta-primary</td><td style="padding:9px 12px">inline-flex items-center gap-2.5 border border-ember bg-ember px-7 py-4 font-mono text-[11.5px] uppercase tracking-[.2em] text-ground hover:bg-[#ff8124]</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="margin:0;max-width:64ch;font-size:14px;line-height:1.7;color:#8E969B">Rounded corners are never used — no <code style="font-family:'IBM Plex Mono',monospace;font-size:.88em;color:#00BFFF;background:rgba(0,191,255,.07);padding:2px 6px">rounded-*</code> anywhere. The mask surfaces need real CSS custom properties, so keep those in a small stylesheet rather than arbitrary-value classes.</p>
+  </section>
+
+  <hr style="border:0;height:1px;margin:56px 0;background:linear-gradient(90deg,rgba(0,191,255,.35),rgba(255,107,0,.2),transparent)">
+
+  <section id="conversion">
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.3em;text-transform:uppercase;color:#00BFFF;margin-bottom:14px">09 — Conversion &amp; launch</div>
+    <h2 style="margin:0 0 18px;font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:clamp(26px,3.4vw,38px);line-height:1.08;letter-spacing:-.015em;color:#F5F5F5">Nine changes that pay for themselves.</h2>
+    <ol style="margin:0 0 26px;padding-left:24px;max-width:66ch;font-size:15px;line-height:1.75">
+      <li style="margin:10px 0">Keep the estimator above the form on mobile — price uncertainty, not form length, is what stops an upload.</li>
+      <li style="margin:10px 0">Accept the file before asking for the email. Attachment first, contact second, always.</li>
+      <li style="margin:10px 0">Say "quote in 1 business day" in the hero readout too, not only in the process rail.</li>
+      <li style="margin:10px 0">Add a reorder link in the confirmation email that pre-fills the last job — repeat print work is the margin.</li>
+      <li style="margin:10px 0">Instrument four events: upload started, estimate changed, form submitted, quote approved. Anything else is noise.</li>
+      <li style="margin:10px 0">Give every portfolio tile a material and a lead time in the caption once real photos land. Categories alone do not convert engineers.</li>
+      <li style="margin:10px 0">Offer a "not sure which material" option in the select that routes to a human — unsure visitors abandon selects.</li>
+      <li style="margin:10px 0">Publish the tolerance FAQ as its own indexable page; it is the highest-intent search on this list.</li>
+      <li style="margin:10px 0">Keep the honest renderer line in the footer. Technical buyers notice who tells the truth about small things.</li>
+    </ol>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr));gap:1px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.08)">
+      <div style="padding:22px 20px;background:#131415">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:#FF6B00;margin-bottom:10px">SEO</div>
+        <p style="margin:0;font-size:13.5px;line-height:1.65;color:#8E969B">One h1, sections in document order, Organization + Service + FAQPage JSON-LD, per-service pages later. Metadata in layout, OG image from a static render of the hero.</p>
+      </div>
+      <div style="padding:22px 20px;background:#131415">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:#FF6B00;margin-bottom:10px">Accessibility</div>
+        <p style="margin:0;font-size:13.5px;line-height:1.65;color:#8E969B">Body text at 4.5:1 or better against the scrim, visible 2px blue focus rings, labels tied to every input, 44px minimum targets, reduced-motion honoured, no information available only through the mask.</p>
+      </div>
+      <div style="padding:22px 20px;background:#131415">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:#FF6B00;margin-bottom:10px">Performance</div>
+        <p style="margin:0;font-size:13.5px;line-height:1.65;color:#8E969B">Self-host the three font families as woff2 subsets; defer the 3D bundle; next/image with AVIF for portfolio photos; no analytics before consent. Target LCP under 2.0s on a mid-range laptop with the hero deferred.</p>
+      </div>
+    </div>
+  </section>
+
+  <div style="margin-top:70px;padding-top:28px;border-top:1px solid rgba(255,255,255,.08);display:flex;flex-wrap:wrap;gap:14px 26px;align-items:center;justify-content:space-between;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#5E666B">
+    <span>JR Print Forge · design handoff v1</span>
+    <a href="JR Print Forge.dc.html" style="color:#FF6B00">Back to the live site →</a>
+  </div>
+</main>
+</div>
+</x-dc>
+</body>
+</html>

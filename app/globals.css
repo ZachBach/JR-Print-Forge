@@ -1,0 +1,146 @@
+@import 'tailwindcss';
+
+/* Design tokens — handoff §08. Nothing outside this block defines a brand
+   colour; component code asks for a token by name. */
+@theme {
+  --color-ground: #0b0c0d;
+  --color-panel: #131415;
+  --color-panel-raised: #171819;
+  --color-charcoal: #252525;
+  --color-graphite: #1a1a1a;
+  --color-blue: #00bfff;
+  --color-ember: #ff6b00;
+  --color-ember-hot: #ff8124;
+  --color-ink: #f5f5f5;
+  --color-body: #8e969b;
+  --color-body-bright: #b4bcc1;
+  --color-dim: #5e666b;
+  --color-meta: #9aa3a8;
+  --color-hairline: rgb(255 255 255 / 8%);
+
+  --font-display: var(--font-chakra-petch), sans-serif;
+  --font-sans: var(--font-plex-sans), system-ui, sans-serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, monospace;
+
+  --ease-forge: cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background: var(--color-ground);
+    color: var(--color-body-bright);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::selection {
+    background: var(--color-ember);
+    color: var(--color-ground);
+  }
+
+  /* Handoff §09 — a visible 2px blue ring on every focusable thing. */
+  :focus-visible {
+    outline: 2px solid var(--color-blue);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   PulseMask — handoff §06.
+
+   The two coordinates are real custom properties written straight onto the
+   element by one pointer handler, never React state: moving the cursor must
+   not re-render a component. They live here rather than in arbitrary-value
+   classes because Tailwind cannot express a var the JS then overwrites.
+--------------------------------------------------------------------------- */
+.pm-surface {
+  --pm-r: 200px;
+  --mx: 50%;
+  --my: 50%;
+}
+
+/* The hero rests off-centre so the untouched composition still favours the
+   copy on the left — handoff §06. */
+.pm-hero {
+  --mx: 72%;
+  --my: 46%;
+}
+
+.pm-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* Overlay is hidden inside the circle — the cursor burns a hole through it. */
+.pm-wipe {
+  mask-image: radial-gradient(
+    circle var(--pm-r) at var(--mx) var(--my),
+    transparent 0 34%,
+    #000 88%
+  );
+  -webkit-mask-image: radial-gradient(
+    circle var(--pm-r) at var(--mx) var(--my),
+    transparent 0 34%,
+    #000 88%
+  );
+}
+
+/* Overlay exists only inside the circle — an inspection light. */
+.pm-reveal {
+  mask-image: radial-gradient(
+    circle var(--pm-r) at var(--mx) var(--my),
+    #000 0 46%,
+    transparent 92%
+  );
+  -webkit-mask-image: radial-gradient(
+    circle var(--pm-r) at var(--mx) var(--my),
+    #000 0 46%,
+    transparent 92%
+  );
+}
+
+.pm-fade {
+  opacity: 0;
+  transition: opacity 0.28s ease;
+}
+
+.pm-surface:hover .pm-fade {
+  opacity: 1;
+}
+
+/* With no pointer there is no spotlight, so the composition has to read on its
+   own: the overlay goes flat and static rather than masking to a dead centre. */
+@media (hover: none), (pointer: coarse) {
+  .pm-wipe,
+  .pm-reveal {
+    mask-image: none;
+    -webkit-mask-image: none;
+    opacity: 0.55;
+  }
+
+  .pm-fade {
+    opacity: 0.55;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pm-fade {
+    transition: none;
+  }
+}
+
+/* Chrome/Safari draw a disclosure marker that the design does not use. */
+.faq-summary::-webkit-details-marker {
+  display: none;
+}

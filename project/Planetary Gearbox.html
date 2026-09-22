@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Planetary Gearbox — JR Print Forge</title>
+<meta name="description" content="A printed 4:1 planetary gearbox from JR Print Forge. Orbit it, inspect it, download the OBJ or GLB.">
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.184.0/build/three.module.js",
+    "three/addons/controls/OrbitControls.js": "https://unpkg.com/three@0.184.0/examples/jsm/controls/OrbitControls.js",
+    "three/addons/exporters/OBJExporter.js": "https://unpkg.com/three@0.184.0/examples/jsm/exporters/OBJExporter.js",
+    "three/addons/exporters/GLTFExporter.js": "https://unpkg.com/three@0.184.0/examples/jsm/exporters/GLTFExporter.js"
+  },
+  "integrity": {
+    "https://unpkg.com/three@0.184.0/build/three.module.js": "sha384-8FCZ1eVO6it4+pbec2aDtnTrwjWXZLJRC+MAGCIPDgsYnUrl/E0A2YlF8ioMKI/J",
+    "https://unpkg.com/three@0.184.0/build/three.core.js": "sha384-dw2ooPewaEIrAgl6oFDBmmBWCE9oW9LxRGcfwZ0hLvEprzo202wXl7vCYHRlSnOT",
+    "https://unpkg.com/three@0.184.0/examples/jsm/controls/OrbitControls.js": "sha384-4rziNxOBZKQ69i+w+f89KJ55TCYquwchVbByQwmaOeIOXdOU2PLDn3kOfXHwIJC9",
+    "https://unpkg.com/three@0.184.0/examples/jsm/exporters/OBJExporter.js": "sha384-nbwtoZENJD3Vq+ACK0CuGQdPMuDWHkamC2KJD70EV5nfg6jQjfppKOea07YJN+N3",
+    "https://unpkg.com/three@0.184.0/examples/jsm/exporters/GLTFExporter.js": "sha384-VofkvpG6HERhFCYbsUOHeNXBCqID2nfqkQqnVzE1jc/oPcz+qJ13ADdXH08hE+cQ"
+  }
+}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box}
+  html,body{margin:0;background:#0B0C0D;color:#C7CDD1;font-family:'IBM Plex Sans',system-ui,sans-serif}
+  a{color:#00BFFF;text-decoration:none}
+  a:hover{color:#FF6B00}
+  three-d-stage:not(:defined){visibility:hidden}
+  header{position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;gap:16px;
+    padding:12px clamp(16px,4vw,44px);background:rgba(11,12,13,.88);backdrop-filter:blur(14px);
+    border-bottom:1px solid rgba(255,255,255,.08)}
+  .mark{display:flex;align-items:center;gap:11px}
+  .mark img{width:32px;height:32px;display:block;border:1px solid rgba(255,255,255,.14)}
+  .mark b{font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:14px;letter-spacing:.14em;color:#F5F5F5}
+  .back{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:#9AA3A8}
+  .wrap{display:grid;grid-template-columns:minmax(0,1fr) 320px;min-height:calc(100vh - 57px)}
+  three-d-stage{display:block;width:100%;height:100%;min-height:64vh}
+  aside{border-left:1px solid rgba(255,255,255,.08);padding:clamp(24px,3vw,36px);background:#0E0F10}
+  .kick{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.28em;text-transform:uppercase;color:#00BFFF;margin-bottom:14px}
+  h1{margin:0 0 12px;font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:28px;line-height:1.05;color:#F5F5F5}
+  p{margin:0 0 22px;font-size:14px;line-height:1.65;color:#8E969B}
+  dl{display:grid;grid-template-columns:1fr auto;gap:10px 14px;margin:0 0 24px;font-size:13px;
+    border-top:1px solid rgba(255,255,255,.08);padding-top:18px}
+  dt{color:#8E969B}
+  dd{margin:0;text-align:right;font-family:'IBM Plex Mono',monospace;color:#F5F5F5}
+  .cta{display:inline-flex;align-items:center;gap:9px;padding:14px 22px;background:#FF6B00;border:1px solid #FF6B00;
+    color:#0B0C0D;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.2em;text-transform:uppercase}
+  .cta:hover{background:#ff8124;color:#0B0C0D}
+  .note{font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:#5E666B;margin-top:18px}
+  @media (max-width:900px){.wrap{grid-template-columns:1fr}aside{border-left:0;border-top:1px solid rgba(255,255,255,.08)}}
+</style>
+</head>
+<body>
+<header>
+  <a class="mark" href="JR Print Forge.dc.html">
+    <img src="uploads/jr-print-forge.jpg" alt="JR Print Forge">
+    <b>JR PRINT FORGE</b>
+  </a>
+  <a class="back" href="JR Print Forge.dc.html">← Back to site</a>
+</header>
+
+<div class="wrap">
+  <three-d-stage name="jr-planetary-gearbox" background="#0B0C0D" autorotate></three-d-stage>
+  <aside>
+    <div class="kick">Reference part · 001</div>
+    <h1>4:1 Planetary Gearbox</h1>
+    <p>Printed sun, planets and internal ring gear on steel pins — the part we hand people when they ask whether printed gears can carry anything. Drag to orbit, scroll to zoom, then take the geometry with you.</p>
+    <dl>
+      <dt>Reduction</dt><dd>4:1</dd>
+      <dt>Module</dt><dd>2 mm</dd>
+      <dt>Teeth (S/P/R)</dt><dd>18 / 18 / 54</dd>
+      <dt>Face width</dt><dd>13 mm</dd>
+      <dt>Outer diameter</dt><dd>66 mm</dd>
+      <dt>Named parts</dt><dd id="partCount">—</dd>
+      <dt>Materials</dt><dd>5</dd>
+    </dl>
+    <a class="cta" href="JR Print Forge.dc.html#quote">Quote a part like this →</a>
+    <div class="note">Download OBJ + MTL or GLB from the stage toolbar. Dimensions scaled for display — tell us your real envelope.</div>
+  </aside>
+</div>
+
+<script src="three-d-stage.js"></script>
+<script type="module">
+  import { buildGearbox } from './gearbox.js';
+  const stage = document.querySelector('three-d-stage');
+  const { THREE } = await stage.ready;
+
+  // The stage ships no environment map, so metalness is capped and metal
+  // is carried by a brighter base color instead of reflections.
+  const makeMaterial = (name, spec) => {
+    const m = new THREE.MeshStandardMaterial({
+      color: spec.color,
+      metalness: Math.min(spec.metalness, 0.35),
+      roughness: spec.roughness,
+    });
+    if (name === 'steelShaft') m.color.set(0xd6dde1);
+    if (name === 'nylonPA12') m.color.set(0x35393d);
+    m.name = name;
+    return m;
+  };
+
+  const { group, spec } = buildGearbox(THREE, makeMaterial);
+  group.traverse((o) => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
+  stage.setObject(group);
+
+  let n = 0;
+  group.traverse((o) => { if (o.isMesh) n++; });
+  document.getElementById('partCount').textContent = String(n);
+</script>
+</body>
+</html>
