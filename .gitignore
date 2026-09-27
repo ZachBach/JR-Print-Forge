@@ -13,6 +13,13 @@ next-env.d.ts
 *.log
 npm-debug.log*
 
+# Personal task notes — not source.
+/zna-tasks.md
+
+# Purchased models and their splits: licensed to the owner, and this repo is
+# public — never commit them. (Files already tracked here stay tracked.)
+/project/uploads/
+
 # Test exports downloaded from the /gearbox viewer while developing — not source.
 /jr-planetary-gearbox.obj
 /jr-planetary-gearbox.mtl
