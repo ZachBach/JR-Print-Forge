@@ -14,10 +14,13 @@ npm test             # node --test over lib/**/*.test.ts (Node 22.18+, type stri
 node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test lib/relief/mesh.test.ts
 # relief pipeline timings
 node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON lib/relief/bench.ts
+# CAD pipeline timings and file sizes; --write <dir> drops the STEP/DXF/3MF to inspect
+node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON lib/cad/bench.ts
 ```
 
-Tests run TypeScript directly in Node, so files under `lib/relief/` import each other with explicit
-`.ts` extensions (`./mesh.ts`). Keep that; code outside `lib/` imports them through `@/lib/relief/...`.
+Tests run TypeScript directly in Node, so files under `lib/relief/` and `lib/cad/` import each other with
+explicit `.ts` extensions (`./mesh.ts`). Keep that; code outside `lib/` imports them through
+`@/lib/relief/...` and `@/lib/cad/...`.
 
 This is a Next.js 15 app, not a static folder: `python -m http.server` on this repo serves nothing useful
 (that command belongs to the sibling `project-phoenix-uav` repo's `site/`).
@@ -99,6 +102,56 @@ Image → printable part (keychain/plaque/coaster, lithophane, cookie cutter), e
 consistently wound solid) → `export.ts` (streamed 3MF, binary STL). The invariant the tests enforce: every
 mesh is watertight (each edge shared by exactly two triangles in opposite directions).
 `components/sketch/pipeline.worker.ts` runs build/export off the main thread.
+
+`/sketch` is **order-only**: the geometry is never offered as a download. Every file the pipeline
+produces is attached to the quote request and goes to the shop.
+
+### Sketch to CAD (`lib/cad/`)
+
+The same height field, recovered as CAD geometry instead of cells. Pure and tested, same conventions as
+`lib/relief/`; it depends on `lib/relief` (raster ops, the `Mesh`/`HeightField` types) and nothing depends
+on it.
+
+`contour.ts` (mask → signed distance field → marching squares at the zero level, so the outline sits
+between cells rather than on them) → `polygon.ts` (winding and containment: outer rings CCW, holes CW —
+every consumer takes its outward direction from the edge order, so that convention is load-bearing) →
+`simplify.ts` (`dropCollinear` → `sharpenRing` → RDP to a stated mm tolerance — **in that order**: collapsing
+the straight runs first makes the grid's half-cell corner chamfer a single short segment that can be squared
+up reliably, where simplifying first leaves it depending on which chamfer points RDP happened to keep) →
+`triangulate.ts` (ear clipping with bridged holes) →
+`solid.ts` (profile × two Z planes → watertight mesh) → `model.ts` (`toCad`: recover the distinct heights
+and extrude each as a pad, bottom up, like the part would be modelled).
+
+Outputs: `step.ts` (AP214 `MANIFOLD_SOLID_BREP`, planar faces, the cap carrying holes as inner loops),
+`dxf.ts` (R12, one closed polyline per ring, a layer per body; a ring that fits a circle is written as a
+true `CIRCLE`), `threemf.ts` (one object per body with its own base material, so the plate and design can go
+to different filaments), `print.ts` (layer arithmetic, filament mass, plate fit).
+
+`features.ts` reads nominal dimensions back off the outline — a rasterised keyring hole becomes "Ø5.24 mm"
+rather than a thirty-sided polygon. Its `residual` is measured at edge *midpoints* as well as vertices, and
+that is the whole point: simplification keeps vertices on the curve, so a circle cut to eight points has all
+eight exactly on it while its edges bow 0.76 mm inside. Judging on vertices alone would substitute a `CIRCLE`
+most of a millimetre bigger than the part. Diameters are reported as measured, never snapped to the number
+the design probably meant — the traced hole is the hole that gets printed.
+
+`overlay.ts` turns the outline into SVG paths in grid-cell coordinates, drawn over the height map in the
+studio. It is the only part of the CAD pipeline the customer can actually see, and it is how a bad trace
+(a closed gap, a swallowed stroke) gets caught before an order.
+
+Things to keep in mind here:
+
+- **A continuous relief has no CAD form.** A lithophane has a different thickness at nearly every pixel;
+  `toCad` refuses past `maxLevels` distinct heights and returns a reason. Do not "fix" that by lowering the
+  bar — the mesh is the correct representation for it.
+- **Failure is reported, never guessed.** `triangulateProfile` measures the area it produced against the
+  profile's own area and returns null on disagreement; `extrudeProfile` and `toCad` propagate that. The mesh
+  path stays available, so declining costs nothing and a silently wrong solid would cost a print.
+- `lib/cad/testing.ts` parses the STEP back and checks what the format actually requires — references
+  resolve, shells closed, every edge used twice in opposite directions, every face wound to its own normal.
+  It is the closest thing to "it opens in Fusion" available without Fusion; run it on anything the writer
+  changes.
+- `print.ts` **reports** dimensions that miss a layer boundary rather than snapping them. Changing a
+  customer's stated thickness is their call, not ours.
 
 ### Gearbox (`/gearbox`)
 
