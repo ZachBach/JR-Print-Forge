@@ -1,7 +1,11 @@
 import type { ImageSettings, ProductSpec } from '@/lib/relief/products';
-import type { Built, WorkerRequest, WorkerResponse } from './pipeline.worker';
+import type { LayerKey, PlateKey } from '@/lib/cad/print';
+import type { Built, CadFormat, CadSummary, WorkerRequest, WorkerResponse } from './pipeline.worker';
 
-export type { Built };
+export type { Built, CadFormat, CadSummary };
+
+/** Either the CAD model's numbers, or why this part has none. */
+export type CadState = { ok: true; summary: CadSummary } | { ok: false; reason: string };
 
 export interface BuildInput {
   spec: ProductSpec;
@@ -77,6 +81,25 @@ export class Pipeline {
   /** Writes the mesh currently on screen. */
   async export(format: '3mf' | 'stl', title: string, description: string): Promise<ArrayBuffer> {
     const res = await this.send({ type: 'export', format, title, description });
+    if (res.type === 'exported') return res.bytes;
+    throw new Error(res.type === 'error' ? res.message : 'Export failed.');
+  }
+
+  /**
+   * Recover the CAD model of the part on screen. Returns the reason instead of
+   * throwing when the part has no CAD form — a lithophane never will, and that is
+   * an answer, not a failure.
+   */
+  async cad(opts: { tolerance?: number; material?: string; layer?: LayerKey; plate?: PlateKey } = {}): Promise<CadState> {
+    const res = await this.send({ type: 'cad', ...opts });
+    if (res.type === 'cad') return { ok: true, summary: res.summary };
+    if (res.type === 'noCad') return { ok: false, reason: res.reason };
+    throw new Error(res.type === 'error' ? res.message : 'The CAD build failed.');
+  }
+
+  /** Writes the CAD model — needs a successful `cad()` first. */
+  async exportCad(format: CadFormat, title: string, description: string, colours: string[]): Promise<ArrayBuffer> {
+    const res = await this.send({ type: 'exportCad', format, title, description, colours });
     if (res.type === 'exported') return res.bytes;
     throw new Error(res.type === 'error' ? res.message : 'Export failed.');
   }

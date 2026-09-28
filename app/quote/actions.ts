@@ -27,7 +27,7 @@ const QuoteSchema = z.object({
 
 const MAX_FILES = 10;
 const MAX_BYTES = 100 * 1024 * 1024;
-const ALLOWED = ['.stl', '.step', '.stp', '.obj', '.3mf', '.pdf', '.png', '.jpg', '.jpeg'];
+const ALLOWED = ['.stl', '.step', '.stp', '.obj', '.3mf', '.dxf', '.pdf', '.png', '.jpg', '.jpeg'];
 
 export type QuoteResult =
   | { ok: true; reference: string }

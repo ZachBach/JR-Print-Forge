@@ -29,7 +29,7 @@ import {
 } from '@/lib/relief/products';
 import type { Box } from '@/lib/relief/raster';
 import { analysisGrid, greyGrid, loadFile, sampleSketch, toPng, type Source } from './image';
-import { Pipeline, type Built } from './pipeline';
+import { Pipeline, type Built, type CadState } from './pipeline';
 
 // three.js and the viewer stay off the critical path, same as the other stages.
 const SketchStage = dynamic(() => import('./SketchStage'), {
@@ -140,6 +140,7 @@ export default function SketchStudio() {
   const [backlit, setBacklit] = useState(true);
 
   const [built, setBuilt] = useState<Built | null>(null);
+  const [cad, setCad] = useState<CadState | null>(null);
   const [cell, setCell] = useState(detail);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -231,6 +232,22 @@ export default function SketchStudio() {
     return () => clearTimeout(t);
   }, [source, crop, kind, specs, img, mode, detail]);
 
+  /**
+   * Recover the CAD model once the build has settled. It costs more than a
+   * rebuild — tracing outlines and triangulating them — so it deliberately lags
+   * behind the sliders instead of running on every drag.
+   */
+  useEffect(() => {
+    setCad(null);
+    if (!built || built.triangles === 0) return;
+    const t = setTimeout(() => {
+      const p = pipeline.current;
+      if (!p) return;
+      void p.cad({ material: order.material }).then(setCad, () => setCad(null));
+    }, 400);
+    return () => clearTimeout(t);
+  }, [built, order.material]);
+
   useEffect(() => {
     const canvas = thumbRef.current;
     if (!canvas || !built) return;
@@ -269,8 +286,37 @@ export default function SketchStudio() {
         fd.set('qty', String(order.qty));
         fd.set('size', sizeKey(built.size));
         const notes = String(form.get('notes') ?? '').trim();
-        fd.set('description', notes ? `${summary}\n\nCustomer notes: ${notes}` : summary);
+        const lines = [summary];
+        if (cad?.ok) {
+          const s = cad.summary;
+          lines.push(
+            `CAD: ${s.bodies.length} extruded ${s.bodies.length === 1 ? 'body' : 'bodies'} ` +
+              `(${s.bodies.map((b) => `${b.name} ${mm(b.z1 - b.z0)}`).join(', ')}), outlines simplified to ` +
+              `±${s.tolerance.toFixed(2)} mm, ${s.segments} segments. STEP solid + DXF outlines attached` +
+              (s.bodies.length > 1 ? ', plus a 3MF split per body for two-colour printing' : '') +
+              `. ${s.grams.toFixed(1)} g solid at ${mm(s.layerHeight, 2)} layers.`,
+          );
+        }
+        if (notes) lines.push(`Customer notes: ${notes}`);
+        fd.set('description', lines.join('\n\n'));
         fd.append('files', new File([bytes], `${fileBase}.3mf`, { type: 'model/3mf' }));
+
+        // The CAD model goes with it: a STEP solid the shop can put a fillet on,
+        // the outlines as a DXF to redraw from, and — when the part has more than
+        // one level — a 3MF split into bodies so it can be printed in two colours.
+        if (cad?.ok) {
+          const second = COLORS.find((c) => c[0] !== color[0]) ?? COLORS[0];
+          const colours = [color[0], second[0]];
+          const step = await p.exportCad('step', title, summary, colours);
+          fd.append('files', new File([step], `${fileBase}.step`, { type: 'application/step' }));
+          const dxf = await p.exportCad('dxf', title, summary, colours);
+          fd.append('files', new File([dxf], `${fileBase}.dxf`, { type: 'application/dxf' }));
+          if (cad.summary.bodies.length > 1) {
+            const split = await p.exportCad('cad3mf', title, summary, colours);
+            fd.append('files', new File([split], `${fileBase}-bodies.3mf`, { type: 'model/3mf' }));
+          }
+        }
+
         // The original goes too, so the shop can redraw it if the auto-trace
         // isn't good enough. The quote form takes PNG and JPG as they are.
         if (source.file && /\.(png|jpe?g)$/i.test(source.file.name)) {
@@ -528,6 +574,63 @@ export default function SketchStudio() {
                 <li className="border-l-2 border-blue/60 pl-3 text-body">No problems found by our automatic checks.</li>
               )}
             </ul>
+          )}
+
+          {/* What the shop gets: the part as CAD geometry, not just a mesh. */}
+          {cad && (
+            <div className="mt-5 border-t border-hairline pt-4">
+              <span className={SUB}>CAD model</span>
+              {cad.ok ? (
+                <>
+                  <dl className="m-0 mt-3 grid grid-cols-[1fr_auto] gap-x-3.5 gap-y-2.5 text-[13px]">
+                    {cad.summary.bodies.map((b) => (
+                      <div key={b.name} className="contents">
+                        <dt className="text-body">{b.name}</dt>
+                        <dd className="m-0 text-right font-mono text-ink">
+                          {mm(b.z1 - b.z0)} · {Math.round(b.layers)} layers · {b.segments} seg
+                          {b.holes > 0 ? ` · ${b.holes} hole${b.holes > 1 ? 's' : ''}` : ''}
+                        </dd>
+                      </div>
+                    ))}
+                    <div className="contents">
+                      <dt className="text-body">Outline tolerance</dt>
+                      <dd className="m-0 text-right font-mono text-ink">±{cad.summary.tolerance.toFixed(2)} mm</dd>
+                    </div>
+                    <div className="contents">
+                      <dt className="text-body">Solid triangles</dt>
+                      <dd className="m-0 text-right font-mono text-ink">
+                        {cad.summary.triangles.toLocaleString('en-US')}
+                        {built && built.triangles > 0
+                          ? ` (${Math.round((1 - cad.summary.triangles / built.triangles) * 100)}% fewer)`
+                          : ''}
+                      </dd>
+                    </div>
+                    <div className="contents">
+                      <dt className="text-body">Filament, solid</dt>
+                      <dd className="m-0 text-right font-mono text-ink">{cad.summary.grams.toFixed(1)} g</dd>
+                    </div>
+                  </dl>
+                  <p className="mt-3 text-[13px] leading-[1.55] text-body">
+                    Sent with your request as a STEP solid and a DXF of the outlines, at{' '}
+                    {mm(cad.summary.layerHeight, 2)} layers
+                    {cad.summary.bodies.length > 1
+                      ? ', plus a 3MF split into bodies so the design can print in a second colour.'
+                      : '.'}
+                  </p>
+                  {cad.summary.warnings.length > 0 && (
+                    <ul className="mt-3 flex list-none flex-col gap-2 p-0 text-[13px] leading-[1.55]">
+                      {cad.summary.warnings.map((w) => (
+                        <li key={w} className="border-l-2 border-blue/60 pl-3 text-body-bright">
+                          {w}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </>
+              ) : (
+                <p className="mt-3 text-[13px] leading-[1.55] text-body">{cad.reason}</p>
+              )}
+            </div>
           )}
         </section>
 
