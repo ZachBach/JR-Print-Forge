@@ -3,7 +3,7 @@ import Image from 'next/image';
 const SERVICE_LINKS = [
   'Rapid Prototyping',
   'Functional Parts',
-  'Resin & FDM Printing',
+  'FDM Printing',
   'CAD Design',
   'Production Runs',
 ];
@@ -60,6 +60,9 @@ export default function Footer() {
             </a>
             <a href="/gearbox" className="text-meta transition-colors hover:text-blue">
               3D part viewer
+            </a>
+            <a href="/sketch" className="text-meta transition-colors hover:text-blue">
+              Sketch to print
             </a>
             <span className="font-mono text-[11px] tracking-[.1em] text-dim">
               Mon–Fri · quotes in 1 business day

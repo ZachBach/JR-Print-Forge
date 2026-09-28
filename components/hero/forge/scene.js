@@ -27,54 +27,77 @@ function sparkTexture(THREE, inner, outer) {
   return t;
 }
 
-// ---- JR: slab letterforms drawn as closed paths, extruded and bevelled ----
-/** The wordmark's built dimensions, shared with the logo-morph lattice. */
-export const WORD = { height: 0.46, depth: 0.14, x: 0.30, y: -0.66, z: 0.12, gap: 0.68 };
+// ---- JR: bracketed-serif letterforms, extruded and bevelled ---------------
+/** The wordmark's built dimensions, shared with the lattice and the particle cast. */
+export const WORD = { height: 0.46, depth: 0.14, x: 0.30, y: -0.66, z: 0.12, gap: 0.78 };
 
-/** The two slab letterforms, for anything that needs to trace their outline. */
+// The monogram follows the brand mark (the serif JR over the anvil in
+// public/jr-print-forge.jpg): bracketed slab serifs, a ball-terminal J, a
+// straight-legged R with a foot serif. Path data in cap-height units — y up,
+// baseline 0, cap 1 — so the same numbers can be previewed as SVG.
+const GLYPH_J = [
+  ['M', 0.14, 1.0], ['L', 0.70, 1.0], ['L', 0.70, 0.915],
+  ['C', 0.615, 0.915, 0.555, 0.90, 0.545, 0.835],
+  ['L', 0.545, 0.30],
+  ['C', 0.545, 0.085, 0.425, -0.02, 0.24, -0.02],
+  ['C', 0.075, -0.02, -0.035, 0.065, -0.035, 0.185],
+  ['C', -0.035, 0.27, 0.025, 0.325, 0.10, 0.325],
+  ['C', 0.175, 0.325, 0.225, 0.275, 0.225, 0.205],
+  ['C', 0.225, 0.155, 0.205, 0.125, 0.185, 0.105],
+  ['C', 0.215, 0.085, 0.24, 0.078, 0.262, 0.078],
+  ['C', 0.29, 0.078, 0.305, 0.11, 0.305, 0.20],
+  ['L', 0.305, 0.835],
+  ['C', 0.295, 0.90, 0.23, 0.915, 0.14, 0.915],
+  ['Z'],
+];
+
+const GLYPH_R = [
+  ['M', 0.0, 1.0], ['L', 0.54, 1.0],
+  ['C', 0.725, 1.0, 0.845, 0.915, 0.845, 0.775],
+  ['C', 0.845, 0.66, 0.765, 0.59, 0.635, 0.568],
+  ['L', 0.835, 0.13],
+  ['C', 0.85, 0.098, 0.872, 0.085, 0.91, 0.085],
+  ['L', 0.95, 0.085], ['L', 0.95, 0.0], ['L', 0.60, 0.0], ['L', 0.60, 0.085], ['L', 0.625, 0.085],
+  ['L', 0.44, 0.525], ['L', 0.34, 0.525], ['L', 0.34, 0.14],
+  ['C', 0.345, 0.10, 0.38, 0.085, 0.46, 0.085],
+  ['L', 0.46, 0.0], ['L', 0.0, 0.0], ['L', 0.0, 0.085],
+  ['C', 0.075, 0.085, 0.098, 0.10, 0.10, 0.14],
+  ['L', 0.10, 0.86],
+  ['C', 0.098, 0.90, 0.075, 0.915, 0.0, 0.915],
+  ['Z'],
+  // the bowl's counter
+  ['M', 0.34, 0.605], ['L', 0.49, 0.605],
+  ['C', 0.57, 0.605, 0.60, 0.665, 0.60, 0.76],
+  ['C', 0.60, 0.855, 0.565, 0.915, 0.49, 0.915],
+  ['L', 0.34, 0.915], ['Z'],
+];
+
+/** Path commands → a Shape; every subpath after the first is a hole. */
+function pathShape(THREE, cmds) {
+  const shape = new THREE.Shape();
+  let cur = shape;
+  let started = false;
+  for (const [c, ...v] of cmds) {
+    if (c === 'M') {
+      if (started) { cur = new THREE.Path(); shape.holes.push(cur); }
+      cur.moveTo(v[0], v[1]);
+      started = true;
+    } else if (c === 'L') cur.lineTo(v[0], v[1]);
+    else if (c === 'C') cur.bezierCurveTo(v[0], v[1], v[2], v[3], v[4], v[5]);
+    else if (c === 'Z') cur.closePath();
+  }
+  return shape;
+}
+
+const glyphJ = (THREE) => pathShape(THREE, GLYPH_J);
+const glyphR = (THREE) => pathShape(THREE, GLYPH_R);
+
+/** The two letterforms, for anything that needs to trace their outline. */
 export function logoGlyphs(THREE) {
   return [
     { shape: glyphJ(THREE), x: 0 },
     { shape: glyphR(THREE), x: WORD.gap },
   ];
-}
-
-function glyphJ(THREE) {
-  const s = new THREE.Shape();
-  s.moveTo(0.30, 1.0);
-  s.lineTo(0.54, 1.0);
-  s.lineTo(0.54, 0.36);
-  s.bezierCurveTo(0.54, 0.12, 0.43, 0.0, 0.26, 0.0);
-  s.bezierCurveTo(0.10, 0.0, 0.0, 0.12, 0.0, 0.31);
-  s.lineTo(0.24, 0.31);
-  s.bezierCurveTo(0.24, 0.21, 0.265, 0.195, 0.30, 0.20);
-  s.lineTo(0.30, 0.36);
-  s.closePath();
-  return s;
-}
-
-function glyphR(THREE) {
-  const s = new THREE.Shape();
-  s.moveTo(0.0, 0.0);
-  s.lineTo(0.24, 0.0);
-  s.lineTo(0.24, 0.52);
-  s.lineTo(0.36, 0.52);
-  s.lineTo(0.60, 0.0);
-  s.lineTo(0.86, 0.0);
-  s.lineTo(0.585, 0.565);
-  s.bezierCurveTo(0.74, 0.62, 0.80, 0.70, 0.80, 0.80);
-  s.bezierCurveTo(0.80, 0.93, 0.70, 1.0, 0.50, 1.0);
-  s.lineTo(0.0, 1.0);
-  s.closePath();
-  const hole = new THREE.Path();
-  hole.moveTo(0.24, 0.62);
-  hole.lineTo(0.47, 0.62);
-  hole.bezierCurveTo(0.54, 0.62, 0.56, 0.68, 0.56, 0.735);
-  hole.bezierCurveTo(0.56, 0.79, 0.53, 0.83, 0.46, 0.83);
-  hole.lineTo(0.24, 0.83);
-  hole.closePath();
-  s.holes.push(hole);
-  return s;
 }
 
 export function buildWordmark(THREE, material, opts = {}) {
@@ -83,7 +106,7 @@ export function buildWordmark(THREE, material, opts = {}) {
   g.name = 'jr_wordmark';
   const letters = [
     ['letter_J', glyphJ(THREE), 0],
-    ['letter_R', glyphR(THREE), 0.68],
+    ['letter_R', glyphR(THREE), WORD.gap],
   ];
   letters.forEach(([name, shape, x]) => {
     let geo = new THREE.ExtrudeGeometry(shape, {
@@ -105,13 +128,132 @@ export function buildWordmark(THREE, material, opts = {}) {
   return g;
 }
 
+// ---- the bladesmith's blow ---------------------------------------------------
+// Rig space, metres. The smith stands at the heel end (-x), tongs in one hand
+// holding the blade by its tang, hammer in the other, and walks blows along
+// the blade from the heel toward the point; after each pass the blade is
+// turned over so both bevels are drawn evenly.
+const FACE_TOP = 0.21;                  // anvil face
+const BLADE_T = 0.008;                  // blade thickness at the spine
+const BLADE_TOP = FACE_TOP + BLADE_T;
+const HANDLE = 0.34;                    // grip → centre of the head
+const FACE_DROP = 0.05;                 // centre of the head → striking face
+const GRIP_Y = BLADE_TOP + FACE_DROP;   // handle height when the face lands flat
+const LIFT = 0.95;                      // head angle at the top of the lift, rad
+const REST = 0.3;                       // held low while the blade is turned
+const TOP = { dx: -0.035, dy: 0.07 };   // grip travel up the elbow's arc
+const BEVEL = 0.1;                      // hammer roll that forges the bevel, rad
+const BLOW = 0.9;                       // seconds per blow
+const TURN = 0.8;                       // seconds to turn the blade between passes
+const PASS = [-0.075, -0.025, 0.025, 0.07];     // blows along the blade, heel → point
+const CYCLE = PASS.length * BLOW + TURN;
+/** The cadence the scene actually runs at, for the readout strip. */
+export const STRIKES_PER_MIN = (60 * PASS.length) / CYCLE;
+
+const gripX = (k) => PASS[k] - HANDLE;
+
+/**
+ * The smith's arm at time t. The grip rides the elbow's arc, up and back;
+ * the head rides the wrist. Each lift starts fast — the hammer comes off the
+ * anvil on its own rebound, which is the energy a smith saves for the next
+ * blow — slows to a hang at the top, then the downswing accelerates with the
+ * grip leading and the wrist snapping late, so the face whips flat onto the
+ * work. Every segment ends exactly where the next begins.
+ *
+ * @returns {{ gx: number, gy: number, angle: number, roll: number, flip: number, landed: number }}
+ *          grip position, head angle about z, bevel roll, blade turn (in half
+ *          turns), and the number of blows landed by time t.
+ */
+function smithPose(t) {
+  const n = Math.floor(t / CYCLE);
+  const tc = t - n * CYCLE;
+  const side = n % 2 ? 1 : -1;
+  let gx, gy, angle, roll = side * BEVEL, flip = n, landed;
+
+  if (tc < PASS.length * BLOW) {
+    const k = Math.floor(tc / BLOW);
+    const u = (tc - k * BLOW) / BLOW;
+    landed = n * PASS.length + k;
+    // where this segment starts: off the last blow, or from rest after a turn
+    const x0 = k === 0 ? gripX(0) : gripX(k - 1);
+    const y0 = k === 0 ? GRIP_Y + 0.03 : GRIP_Y;
+    const a0 = k === 0 ? REST : 0;
+    const xTop = gripX(k) + TOP.dx, yTop = GRIP_Y + TOP.dy;
+    if (u < 0.52) {
+      const v = u / 0.52;
+      const e = easeInOut(v);
+      // off a blow the rebound gives a fast start; from rest it is all arm
+      angle = a0 + (LIFT - a0) * (k === 0 ? e : 1 - Math.pow(1 - v, 2.2));
+      gx = x0 + (xTop - x0) * e;
+      gy = y0 + (yTop - y0) * e;
+    } else if (u < 0.62) {
+      const w = (u - 0.52) / 0.1;
+      angle = LIFT + 0.06 * Math.sin(w * Math.PI * 0.5);
+      gx = xTop;
+      gy = yTop + 0.005 * w;
+    } else {
+      const w = (u - 0.62) / 0.38;
+      const lead = Math.pow(w, 1.6), snap = Math.pow(w, 2.8);
+      angle = (LIFT + 0.06) * (1 - snap);
+      gx = xTop - TOP.dx * lead;
+      gy = yTop + 0.005 - (TOP.dy + 0.005) * lead;
+    }
+  } else {
+    // the pass is done: the hammer comes off the last blow to rest while the
+    // tongs turn the blade over, then drifts back to the heel
+    const u = (tc - PASS.length * BLOW) / TURN;
+    landed = (n + 1) * PASS.length;
+    const v = Math.min(1, u / 0.4);
+    angle = REST * (1 - Math.pow(1 - v, 2));
+    gx = gripX(PASS.length - 1) + (gripX(0) - gripX(PASS.length - 1)) * easeInOut(Math.min(1, u / 0.85));
+    gy = GRIP_Y + 0.03 * (1 - Math.pow(1 - v, 2));
+    const turn = easeInOut(clamp01((u - 0.2) / 0.55));
+    flip = n + turn;
+    roll = side * BEVEL * (1 - 2 * turn);
+  }
+  return { gx, gy, angle, roll, flip, landed };
+}
+
+/**
+ * A blade in plan view — tang, heel, straight spine, belly sweeping up to the
+ * point — extruded to thickness and laid flat, then thinned toward the edge
+ * so the cross-section is the double bevel being forged.
+ */
+function bladeGeometry(THREE) {
+  const s = new THREE.Shape();
+  s.moveTo(-0.19, 0.005);
+  s.lineTo(-0.108, 0.006);
+  s.lineTo(-0.1, 0.016);
+  s.lineTo(0.075, 0.016);
+  s.quadraticCurveTo(0.108, 0.015, 0.128, 0.0);
+  s.quadraticCurveTo(0.092, -0.021, 0.02, -0.021);
+  s.lineTo(-0.1, -0.019);
+  s.lineTo(-0.108, -0.006);
+  s.lineTo(-0.19, -0.005);
+  s.closePath();
+  const geo = new THREE.ExtrudeGeometry(s, { depth: BLADE_T, curveSegments: 18, steps: 1, bevelEnabled: false });
+  geo.rotateX(Math.PI / 2);              // plan width → z, thickness → -y
+  geo.translate(0, BLADE_T / 2, 0);      // centred on its mid-plane
+  const p = geo.attributes.position;
+  for (let i = 0; i < p.count; i++) {
+    const edge = clamp01((0.012 - p.getZ(i)) / 0.03);
+    p.setY(i, p.getY(i) * (1 - 0.75 * edge));
+  }
+  geo.computeVertexNormals();
+  return geo;
+}
+
 /**
  * @param {*} THREE         the three namespace
  * @param {*} makeMaterial  (name, spec) => material, from forge-materials
- * @param {{ logoUrl?: string, refine?: (geo: *) => *, flame?: () => * }} [opts]
+ * @param {{ logoUrl?: string, refine?: (geo: *) => *, flame?: () => *,
+ *           wordmark?: boolean, sparks?: boolean }} [opts]
+ *        `wordmark: false` keeps the extruded letters for framing but hides
+ *        them, and `sparks: false` drops the CPU sprite sparks — both for when
+ *        the GPU particle cast draws the logo and throws the sparks instead.
  */
 export function buildForge(THREE, makeMaterial, opts = {}) {
-  const STRIKE_PERIOD = 1.7;
+  const withSparks = opts.sparks !== false;
   const group = new THREE.Group();
   group.name = 'forge_scene';
 
@@ -186,50 +328,72 @@ export function buildForge(THREE, makeMaterial, opts = {}) {
   band.position.y = -0.09;
   group.add(band);
 
-  // ---- hot billet on the face -------------------------------------------
-  const billet = new THREE.Mesh(roundedBox(THREE, 0.19, 0.021, 0.048, 0.006, 6), mat.hot);
-  billet.name = 'hot_billet';
-  billet.position.set(-0.03, 0.2205, 0);
-  group.add(billet);
-  const tongs = new THREE.Mesh(roundedBox(THREE, 0.17, 0.013, 0.024, 0.005, 4), mat.band);
-  tongs.name = 'billet_tongs';
-  tongs.position.set(-0.21, 0.2205, 0);
-  group.add(tongs);
+  // ---- the work: a hot blade held by its tang in the tongs ---------------
+  // Grouped so the tongs can turn blade and all over between passes.
+  const work = new THREE.Group();
+  work.name = 'forge_work';
+  work.position.set(0, FACE_TOP + BLADE_T / 2, 0);
+  const billet = new THREE.Mesh(bladeGeometry(THREE), mat.hot);
+  billet.name = 'hot_blade';
+  work.add(billet);
+  const jaws = new THREE.Mesh(roundedBox(THREE, 0.05, 0.016, 0.02, 0.004, 4), mat.band);
+  jaws.name = 'tong_jaws';
+  jaws.position.set(-0.17, 0, 0);
+  work.add(jaws);
+  const reins = new THREE.Mesh(roundedBox(THREE, 0.2, 0.009, 0.014, 0.003, 3), mat.band);
+  reins.name = 'tong_reins';
+  reins.position.set(-0.29, 0.004, 0);
+  reins.rotation.z = -0.06;
+  work.add(reins);
+  group.add(work);
 
-  // ---- hammer ------------------------------------------------------------
+  // ---- hammer: a cross-peen, gripped at the end of the handle ------------
+  // Built with the grip at the origin and the handle along +x, so the pose is
+  // just "put the grip here, turn the wrist this far". The head stands across
+  // the handle, face down, peen up.
   const hammer = new THREE.Group();
   hammer.name = 'hammer';
-  hammer.position.set(-0.03, 0.663, 0.015);
   const haftGeo = tube(THREE,
-    [[0, 0.02, 0], [0.004, -0.12, 0], [0.004, -0.26, 0], [0, -0.378, 0]],
-    (t) => 0.0135 + t * 0.007, { radial: 20 });
+    [[-0.035, 0, 0], [0.09, 0.003, 0], [0.22, 0.003, 0], [HANDLE - 0.004, 0, 0]],
+    (t) => 0.0155 - t * 0.0045, { radial: 20 });
   const haft = new THREE.Mesh(haftGeo, mat.haft);
   haft.name = 'hammer_haft';
   hammer.add(haft);
-  const headMesh = new THREE.Mesh(roundedBox(THREE, 0.16, 0.064, 0.064, 0.008, 6), mat.head);
+  const headMesh = new THREE.Mesh(roundedBox(THREE, 0.044, FACE_DROP * 2, 0.044, 0.006, 6), mat.head);
   headMesh.name = 'hammer_head';
-  headMesh.position.y = -0.40;
+  headMesh.position.set(HANDLE, 0, 0);
   hammer.add(headMesh);
-  const peen = new THREE.Mesh(new THREE.ConeGeometry(0.032, 0.052, 4), mat.head);
+  const peenGeo = new THREE.ConeGeometry(0.031, 0.045, 4);
+  peenGeo.rotateY(Math.PI / 4);          // square base to the head's faces
+  const peen = new THREE.Mesh(peenGeo, mat.head);
   peen.name = 'hammer_peen';
-  peen.rotation.z = -Math.PI / 2;
-  peen.position.set(0.103, -0.40, 0);
+  peen.scale.x = 0.4;                    // pinched to a wedge across the handle
+  peen.position.set(HANDLE, FACE_DROP + 0.02, 0);
   hammer.add(peen);
   group.add(hammer);
 
+  // Room above the anvil for the lift, so framing leaves the swing in shot.
+  const headroom = new THREE.Object3D();
+  headroom.position.set(gripX(0), FACE_TOP + 0.26, 0);
+  group.add(headroom);
+
   // ---- JR wordmark across the floor, behind the anvil --------------------
   const word = buildWordmark(THREE, mat.word, {
-    height: WORD.height, depth: WORD.depth, refine: opts.refine,
+    height: WORD.height, depth: WORD.depth, refine: opts.wordmark === false ? undefined : opts.refine,
   });
   word.position.set(WORD.x, WORD.y, WORD.z);
+  // Hidden rather than omitted: coreBounds frames on it either way.
+  word.visible = opts.wordmark !== false;
   group.add(word);
 
   // ---- sparks + flame (sprites: WebGPU caps THREE.Points at one pixel) ---
-  const impact = new THREE.Vector3(-0.03, 0.232, 0);
+  // The impact moves blow to blow along the blade; the flame stays put.
+  const impact = new THREE.Vector3(PASS[0], BLADE_TOP + 0.002, 0);
+  const flameAt = new THREE.Vector3(-0.005, BLADE_TOP + 0.002, 0);
   const sparkTex = sparkTexture(THREE, 'rgba(255,245,215,1)', 'rgba(255,140,20,.9)');
 
   const sparks = [];
-  for (let i = 0; i < 64; i++) {
+  for (let i = 0; withSparks && i < 64; i++) {
     const m = new THREE.SpriteMaterial({
       map: sparkTex, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
     });
@@ -247,7 +411,7 @@ export function buildForge(THREE, makeMaterial, opts = {}) {
   let volume = null;
   if (opts.flame) {
     volume = opts.flame();
-    volume.position.set(impact.x, impact.y + volume.userData.height / 2 - 0.022, impact.z);
+    volume.position.set(flameAt.x, flameAt.y + volume.userData.height / 2 - 0.022, flameAt.z);
     group.add(volume);
   }
 
@@ -268,39 +432,57 @@ export function buildForge(THREE, makeMaterial, opts = {}) {
   const c = box.getCenter(new THREE.Vector3());
   group.position.set(-c.x, -c.y, -c.z);
 
-  let lastPhase = 0;
+  let landed = -1;
+  let squash = 0;
   const api = {
-    group, rig, impact, word, strikePeriod: STRIKE_PERIOD, heat: 0.6,
+    group, rig, impact, word, heat: 0.6,
+    /** Blows per minute, as the scene runs them. */
+    strikesPerMin: STRIKES_PER_MIN,
+    /** Blows landed so far; the particle sparks key their bursts on it. */
+    strikes: 0,
     /** Centre of the wordmark in group space — where the logo lattice sits. */
     wordAnchor: new THREE.Vector3(WORD.x, WORD.y + WORD.height / 2, WORD.z),
+    /** The last blow's impact in group space, for systems parented to the group. */
+    impactGroup: rig.position.clone().add(impact),
+    /** Where the flame stands, in group space; the embers rise from here. */
+    flameGroup: rig.position.clone().add(flameAt),
     /** Fired on every hammer blow. @type {null | ((impact: *) => void)} */
     onStrike: /** @type {null | ((impact: *) => void)} */ (null),
     impactWorld: () => rig.localToWorld(impact.clone()),
-    // framing bounds: the hammer's raised arc is allowed to overflow.
-    // The refresh is load-bearing: the recentre on line 251 happens after the
-    // updateMatrixWorld above, and expandByObject trusts its parent's
+    // framing bounds: the top of the lift is allowed to overflow, but the
+    // headroom marker keeps the downswing in shot.
+    // The refresh is load-bearing: the recentre above happens after the
+    // updateMatrixWorld before it, and expandByObject trusts its parent's
     // matrixWorld rather than recomputing it. Without this the box comes back
     // in pre-recentre space and the camera aims at empty air beside the rig.
     coreBounds: () => {
       group.updateMatrixWorld(true);
       const b = new THREE.Box3();
       [word, stump, body, faceTop, horn, billet, band].forEach((o) => b.expandByObject(o));
+      b.expandByPoint(headroom.getWorldPosition(new THREE.Vector3()));
       return b;
     },
     tick(t, dt) {
-      const p = (t % STRIKE_PERIOD) / STRIKE_PERIOD;
-      let a;
-      // raises to the smith's side (-x, away from the horn) and falls onto
-      // the billet, which sits directly under the pivot
-      if (p < 0.62) a = 1.05 * easeInOut(p / 0.62);
-      else if (p < 0.735) a = 1.05 * (1 - Math.pow((p - 0.62) / 0.115, 1.7));
-      else a = 0.14 * Math.sin(((p - 0.735) / 0.265) * Math.PI);
-      hammer.rotation.z = a;
+      const pose = smithPose(t);
+      hammer.position.set(pose.gx, pose.gy, 0);
+      hammer.rotation.set(pose.roll, 0, pose.angle);
+      work.rotation.x = pose.flip * Math.PI;
 
-      const struck = p >= 0.735 && lastPhase < 0.735;
-      lastPhase = p;
+      // Blows are counted from the clock, not from a phase crossing, so a
+      // dropped frame can't swallow one. The first frame only syncs the count.
+      const struck = landed >= 0 && pose.landed > landed;
+      if (struck) impact.x = PASS[(pose.landed - 1) % PASS.length];
+      landed = pose.landed;
+
+      // the blade takes the blow: a thud through its thickness, then back
+      squash *= Math.exp(-dt * 13);
+      billet.scale.y = 1 - squash * 0.25;
 
       if (struck) {
+        api.strikes++;
+        api.impactGroup.copy(rig.position).add(impact);
+        glow.position.copy(impact);
+        squash = 1;
         sparks.forEach((s) => {
           const th = Math.random() * Math.PI * 2;
           const sp = 0.5 + Math.random() * 1.6;
@@ -309,7 +491,7 @@ export function buildForge(THREE, makeMaterial, opts = {}) {
           s.position.copy(impact);
           s.visible = true;
         });
-        glow.intensity = 1.9;
+        glow.intensity = 3.2;
         api.heat = 1;
         if (api.onStrike) api.onStrike(impact);
       }
@@ -332,7 +514,7 @@ export function buildForge(THREE, makeMaterial, opts = {}) {
       if (volume) {
         const f = 1 + (api.heat - 0.55) * 0.55 + Math.sin(t * 5.1) * 0.05;
         volume.scale.set(1 + (f - 1) * 0.35, f, 1 + (f - 1) * 0.35);
-        volume.position.y = impact.y + (volume.userData.height * f) / 2 - 0.022;
+        volume.position.y = flameAt.y + (volume.userData.height * f) / 2 - 0.022;
       }
     },
   };

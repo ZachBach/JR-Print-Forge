@@ -16,6 +16,10 @@ npm-debug.log*
 # Personal task notes — not source.
 /zna-tasks.md
 
+# Claude Code local state: agent worktrees and per-machine settings.
+/.claude/worktrees/
+/.claude/settings.local.json
+
 # Purchased models and their splits: licensed to the owner, and this repo is
 # public — never commit them. (Files already tracked here stay tracked.)
 /project/uploads/

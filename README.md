@@ -8,6 +8,7 @@ npm install
 npm run dev        # http://localhost:3000
 npm run build      # production build
 npm run typecheck  # tsc --noEmit
+npm test           # node --test over lib/**/*.test.ts (Node 22.18+, no test deps)
 ```
 
 ## Stack
@@ -23,6 +24,7 @@ app/
   layout.tsx           fonts, metadata, JSON-LD, skip link
   page.tsx             composes the eight sections (server component)
   gearbox/page.tsx     the reference-part viewer
+  sketch/page.tsx      Sketch to Print: image → printable part
   globals.css          @theme tokens + the PulseMask stylesheet
   quote/actions.ts     server action: validates, prices, hands off the request
 components/
@@ -34,7 +36,9 @@ components/
   PulseSurface.tsx     cursor-mask primitive
   ServiceCard · ProcessRail · WorkTile · StatCell · Testimonials
   quote/               QuoteForm · Estimator · ToleranceFaq
+  sketch/              SketchStudio (UI) · SketchStage · pipeline worker · image
 lib/
+  relief/              image → height field → watertight mesh → 3MF/STL (pure, tested)
   pricing.ts           MATERIAL / SIZE / SPEED tables + estimate()
   businessDays.ts      ship-by date math
   motion.ts            shared variants
@@ -42,10 +46,11 @@ lib/
 project/               the original design bundle — reference, not built
 ```
 
-Only six components are client components: ForgeStage, PulseSurface,
-Testimonials, StatCell, QuoteForm and Estimator. Everything else renders on the
-server, which is what keeps first load at ~123 kB despite the 3D hero — three.js
-is dynamically imported and never enters the initial bundle.
+Client components are kept to the interactive pieces: the hero (Hero,
+ForgeStage), PulseSurface, Reveal and MotionProvider, Testimonials, StatCell,
+QuoteForm and Estimator, the gearbox viewer, and the sketch studio. Everything
+else renders on the server. three.js is dynamically imported on every page that
+uses it and never enters the initial bundle.
 
 ## Before launch
 
@@ -59,7 +64,7 @@ These are deliberate placeholders, not oversights:
   the request but does not yet send it. The payload the email needs is already
   assembled at the `TODO(launch)` marker.
 - **Unverified figures**, per handoff §01: ±0.10 mm tolerance, 12 materials,
-  100% inspected, the $65 setup fee, and all three testimonials. The
+  100% inspected, the $55 setup fee, and all three testimonials. The
   1-business-day quote and 3-business-day build are accurate.
 - **The gearbox's outer diameter reads 120 mm, not the 66 mm printed in the
   prototype.** 120 mm is what the geometry actually measures — a 54-tooth ring
@@ -67,6 +72,35 @@ These are deliberate placeholders, not oversights:
   The spec panel computes every figure from the mesh on screen rather than from
   a table typed beside it, so the label and the part cannot disagree. Change
   the geometry if 66 mm was the intent.
+
+## Sketch to Print (`/sketch`)
+
+A customer uploads a napkin photo, drawing, logo or photograph and gets a
+printable part: a **keychain / plaque / coaster** (design raised or engraved on a
+plate, optionally cut to the drawing's outline, keyring tab, rim), a
+**lithophane**, or a **cookie cutter** that follows the outline. Everything runs
+in the browser; nothing is uploaded until they send it to the shop.
+
+- `lib/relief/raster.ts` — thresholding (a local-mean threshold that ignores
+  shadows across a phone photo), exact distance transform, hole fill, despeckle.
+- `lib/relief/products.ts` — the three products and their printability checks
+  (0.8 mm minimum feature for a 0.4 mm nozzle, plate/lithophane/wall limits,
+  open outlines, bed size). Warnings are shown to the customer and written into
+  the request.
+- `lib/relief/mesh.ts` — height field → one closed, consistently wound solid.
+  Flat areas merge into strips, so a keychain is ~15k triangles, not ~200k.
+- `lib/relief/export.ts` — 3MF (streamed and zipped) and binary STL, straight
+  from the mesh arrays.
+- `components/sketch/pipeline.worker.ts` — builds and exports off the main thread.
+
+The tests assert every mesh is watertight (each edge shared by exactly two
+triangles in opposite directions). Timings: `node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON lib/relief/bench.ts`.
+A keychain builds in about 100 ms; a 150 mm lithophane at 0.2 mm is about 770k
+triangles and takes about 3 s to write as 3MF.
+
+"Send it to the shop" goes through the same `submitQuote` action as the main
+quote form, with the 3MF, the original image and a spec summary attached, and
+requires the customer to confirm they have rights to the image.
 
 ## Two renderers, on purpose
 

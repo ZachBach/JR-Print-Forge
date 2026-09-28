@@ -89,6 +89,12 @@ export default function QuoteForm() {
               }}
               className="pointer-events-none absolute size-px opacity-0"
             />
+            <a
+              href="/sketch"
+              className="mt-2.5 inline-block font-mono text-[10px] uppercase tracking-[.14em] text-blue hover:text-ember"
+            >
+              Only have a drawing? Preview it in 3D first →
+            </a>
           </div>
 
           <div>

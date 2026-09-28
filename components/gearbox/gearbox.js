@@ -61,7 +61,7 @@ export function buildGearbox(THREE, makeMaterial) {
 
   const mat = {
     nylon:  makeMaterial('nylonPA12',  { color: 0x1d2023, metalness: 0.08, roughness: 0.62 }),
-    resin:  makeMaterial('blueResin',  { color: 0x0b6f92, metalness: 0.22, roughness: 0.34 }),
+    petg:   makeMaterial('bluePETG',   { color: 0x0b6f92, metalness: 0.22, roughness: 0.34 }),
     forge:  makeMaterial('forgeOrange',{ color: 0xff6b00, metalness: 0.18, roughness: 0.38 }),
     steel:  makeMaterial('steelShaft', { color: 0x9aa3a8, metalness: 0.92, roughness: 0.22 }),
     graph:  makeMaterial('graphite',   { color: 0x17191b, metalness: 0.12, roughness: 0.78 }),
@@ -126,7 +126,7 @@ export function buildGearbox(THREE, makeMaterial) {
   const planetGeo = extrude(THREE, planetShape, W);
   for (let i = 0; i < 3; i++) {
     const a = (i / 3) * TAU;
-    const p = new THREE.Mesh(planetGeo, mat.resin);
+    const p = new THREE.Mesh(planetGeo, mat.petg);
     p.name = `planet_gear_${i + 1}`;
     p.position.set(Math.cos(a) * (rSun + rPl), 0, Math.sin(a) * (rSun + rPl));
     p.userData.baseAngle = a;

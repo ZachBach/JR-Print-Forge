@@ -143,7 +143,9 @@ export function makeForgeMaterials(THREE, TSL) {
       roughness: spec.roughness ?? 0.5,
     });
     mat.name = name;
-    if (name === 'hammerHead' || name === 'hammerPeen') build.damascus(mat);
+    // a smith's hammer is plain forged steel with a dressed face; the damascus
+    // etch, sized for the old 16 cm head, read as zebra stripes on a 10 cm one
+    if (name === 'hammerHead' || name === 'hammerPeen') build.brushed(mat, { polish: 0.7 });
     else if (name === 'anvilFace') build.brushed(mat, { polish: 1 });
     else if (name === 'anvilSteel' || name === 'anvilHorn' || name === 'steelBand') build.brushed(mat);
     else if (name === 'hotBillet') build.magma(mat);

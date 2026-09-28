@@ -14,7 +14,6 @@ export const MATERIAL = {
   ABS: { factor: 1.2, label: 'ABS — classic engineering' },
   ASA: { factor: 1.3, label: 'ASA — UV stable, outdoor' },
   'PA12-CF': { factor: 2.4, label: 'PA12-CF — nylon carbon fiber' },
-  'Resin 8K': { factor: 1.9, label: 'Resin 8K — fine detail' },
   TPU: { factor: 1.6, label: 'TPU — flexible' },
   unsure: { factor: 1.0, label: 'Not sure — have an engineer advise' },
 } as const;
@@ -36,8 +35,8 @@ export type SizeKey = keyof typeof SIZE;
 export type SpeedKey = keyof typeof SPEED;
 
 /** Flat setup & engineering-review fee, quoted up front. Replace before launch. */
-export const SETUP_FEE = 65;
-const UNIT_BASE = 42;
+export const SETUP_FEE = 55;
+const UNIT_BASE = 38;
 
 export const MIN_QTY = 1;
 export const MAX_QTY = 5000;

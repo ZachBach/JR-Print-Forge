@@ -9,16 +9,45 @@ import { buildForge, logoGlyphs, WORD } from './forge/scene.js';
 import { makeForgeMaterials } from './forge/materials.js';
 import { volumetricFire } from './forge/flame.js';
 import { buildLogoMorph } from './forge/lattice.js';
+import { buildForgeParticles } from './forge/particles.js';
+import { AdaptiveQuality, classify, type QualitySettings } from './forge/quality.js';
 
 export interface ForgeInfo {
   backend: 'webgpu' | 'webgl2-fallback' | 'unavailable';
   vertices: number;
+  /** Particles drawn right now; 0 when the particle system is not running. */
+  particles: number;
+  /** Particles allocated for the session. */
+  pool: number;
+  /** Frames per second over the last full second, once measured. */
+  fps: number;
+  /** Hammer blows per minute, as the scene runs them; 0 when nothing is running. */
+  strikesPerMin: number;
+}
+
+export interface ForgeStats extends ForgeInfo {
+  device: string;
+  cappedBy: string | null;
+  forced: boolean;
+  targetFPS: number;
+  renderScale: number;
+  flameSteps: number;
+  reason: string;
+  gpuBytes: number;
+}
+
+declare global {
+  interface Window {
+    /** Live metrics for local inspection and the headless check. Never transmitted. */
+    __forge?: { stats: ForgeStats };
+  }
 }
 
 interface Props {
   /** Height of the readout strip the rig must clear, in px. */
   bottomInset?: number;
   logoUrl?: string;
+  /** Called when the scene comes up, and again (at most 4×/s) as quality changes. */
   onReady?: (info: ForgeInfo) => void;
 }
 
@@ -68,16 +97,32 @@ function subdivide(
   return g;
 }
 
+/** `?particles=N` pins the pool and turns the adaptive manager off. */
+function forcedCount(): number {
+  const n = Number(new URLSearchParams(window.location.search).get('particles'));
+  return Number.isFinite(n) && n > 0 ? Math.round(n) : 0;
+}
+
 /**
- * ForgeStage — handoff §07.
+ * ForgeStage — handoff §07, rebuilt on Project Phoenix's rendering pattern.
  *
- * Geometry from geo-lib, shading from tsl-lib through forge/materials. Mounted
- * by Hero via dynamic(ssr:false) behind an IntersectionObserver, so the ~600KB
- * of three never lands on the critical path.
+ * This component is the director: one frame loop, and the quality manager
+ * is the only thing in it that makes performance decisions. The particle
+ * system, the pixel ratio and the flame's step count all take what they are
+ * given; none of them measures or adjusts itself.
  *
- * The element reports the backend actually taken rather than the one asked
- * for: claiming WebGPU on a machine that quietly fell back to WebGL2 would be
- * the rendering equivalent of rounding a metric in our favour.
+ *   loop: quality.tick → forge.tick → particles.frame → render
+ *
+ * On WebGPU a GPU-compute particle cast draws the JR monogram, throws the
+ * sparks and feeds the fire. The WebGL2 fallback keeps the extruded wordmark
+ * and CPU sparks, because transform-feedback compute there draws nothing.
+ *
+ * The element reports the backend actually taken and the particle count
+ * actually drawn: claiming a million on a machine that settled at 250,000
+ * would be the rendering equivalent of rounding a metric in our favour.
+ *
+ * Mounted by Hero via dynamic(ssr:false) behind an IntersectionObserver, so
+ * the ~600KB of three never lands on the critical path.
  */
 export default function ForgeStage({
   bottomInset = 0,
@@ -100,6 +145,10 @@ export default function ForgeStage({
       const canvas = document.createElement('canvas');
       canvas.style.cssText = 'display:block;width:100%;height:100%';
       host.appendChild(canvas);
+      // Registered before the await: under Strict Mode the effect is torn down
+      // while init() is still pending, and a canvas left behind here stacks
+      // above the live one and pushes it out of the overflow-hidden host.
+      cleanups.push(() => canvas.remove());
 
       // Opaque, cleared to the page ground. A transparent canvas would have to
       // survive being composited through the bloom pass; clearing to the exact
@@ -108,14 +157,23 @@ export default function ForgeStage({
       await renderer.init();
       if (disposed) { renderer.dispose(); return; }
 
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
       renderer.setClearColor(0x0b0c0d, 1);
       renderer.toneMapping = THREE.ACESFilmicToneMapping;
       renderer.toneMappingExposure = 1.1;
 
-      const backend: ForgeInfo['backend'] =
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (renderer.backend as any)?.isWebGPUBackend ? 'webgpu' : 'webgl2-fallback';
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const gpu = renderer.backend as any;
+      const backend: ForgeInfo['backend'] = gpu?.isWebGPUBackend ? 'webgpu' : 'webgl2-fallback';
+      const info = gpu?.device?.adapterInfo;
+      const cls = classify({
+        backend,
+        adapter: info ? `${info.vendor} ${info.architecture} ${info.description}` : '',
+        coarsePointer: window.matchMedia('(pointer: coarse)').matches,
+        deviceMemory: (navigator as Navigator & { deviceMemory?: number }).deviceMemory ?? 0,
+        maxBufferBytes: gpu?.device?.limits?.maxStorageBufferBindingSize ?? 134217728,
+        forceCount: backend === 'webgpu' ? forcedCount() : 0,
+      });
+      const useParticles = cls.pool > 0;
 
       const scene = new THREE.Scene();
       const camera = new THREE.PerspectiveCamera(32, 1, 0.01, 40);
@@ -123,13 +181,13 @@ export default function ForgeStage({
       const { material, uniforms } = makeForgeMaterials(THREE, TSL);
       const forge = buildForge(THREE, material, {
         logoUrl,
+        wordmark: !useParticles,
+        sparks: !useParticles,
         refine: (geo: THREE.BufferGeometry) => subdivide(geo, 0.05, 5),
-        flame: () => volumetricFire(THREE, TSL, { heat: uniforms.uHeat }),
+        flame: () => volumetricFire(THREE, TSL, { heat: uniforms.uHeat, steps: cls.flameSteps }),
       });
       scene.add(forge.group);
 
-      // The lattice sits behind the rig and slightly below, so the anvil reads
-      // against it and the JR wordmark rises out of it.
       // The wireframe sits exactly on the wordmark — CAD layers over the
       // printed part — and is a child of the rig group so it inherits the
       // recentre rather than needing its own world-space placement.
@@ -143,13 +201,29 @@ export default function ForgeStage({
       forge.group.add(lattice.mesh);
       cleanups.push(() => lattice.dispose());
 
-      // The strip prints what is actually on screen, so the lattice counts too.
+      // ---- particles (WebGPU only) -------------------------------------------
+      const particles = useParticles
+        ? buildForgeParticles(THREE, TSL, {
+          pool: cls.pool,
+          word: forge.word,
+          source: forge.impactGroup,
+          flameBase: forge.flameGroup.clone().add(new THREE.Vector3(0, 0.004, 0)),
+          floorY: WORD.y + WORD.height,
+        })
+        : null;
+      if (particles) {
+        forge.group.add(particles.group);
+        await particles.init(renderer);
+        if (disposed) { renderer.dispose(); return; }
+        cleanups.push(() => particles.dispose());
+      }
+
+      // The strip prints what is actually on screen: hidden meshes don't count.
       let vertices = lattice.mesh.geometry.attributes.position.count;
-      forge.group.traverse((o: THREE.Object3D) => {
+      forge.group.traverseVisible((o: THREE.Object3D) => {
         const m = o as THREE.Mesh;
         if (m.isMesh) vertices += m.geometry.attributes.position.count;
       });
-      readyRef.current?.({ backend, vertices });
 
       scene.add(new THREE.HemisphereLight(0x33424a, 0x08090a, 0.75));
       const key = new THREE.DirectionalLight(0xffffff, 2.6);
@@ -164,13 +238,19 @@ export default function ForgeStage({
 
       // ---- interaction ----------------------------------------------------
       let targetX = 0, targetY = 0, curX = 0, curY = 0, hover = 0;
+      const ndc = new THREE.Vector2();
+      let pointerIn = false;
       const onMove = (e: PointerEvent) => {
         const r = host.getBoundingClientRect();
-        targetX = (((e.clientX - r.left) / r.width) * 2 - 1) * 0.22;
-        targetY = -(((e.clientY - r.top) / r.height) * 2 - 1) * 0.12;
+        const nx = ((e.clientX - r.left) / r.width) * 2 - 1;
+        const ny = -(((e.clientY - r.top) / r.height) * 2 - 1);
+        targetX = nx * 0.22;
+        targetY = ny * 0.12;
+        ndc.set(nx, ny);
         hover = 1;
+        pointerIn = true;
       };
-      const onLeave = () => { hover = 0; targetX = 0; targetY = 0; };
+      const onLeave = () => { hover = 0; targetX = 0; targetY = 0; pointerIn = false; };
       host.addEventListener('pointermove', onMove);
       host.addEventListener('pointerleave', onLeave);
       cleanups.push(() => {
@@ -181,7 +261,9 @@ export default function ForgeStage({
       let strikeAt = -10;
       forge.onStrike = () => {
         strikeAt = performance.now() / 1000;
-        lattice.requestMorph();
+        // With the particle cast the wireframe stays on the letters: it is the
+        // CAD the part is printed from, and a surface morph would bury the rig.
+        if (!particles) lattice.requestMorph();
       };
 
       const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -190,9 +272,15 @@ export default function ForgeStage({
       const size = bounds.getSize(new THREE.Vector3());
       const mid = bounds.getCenter(new THREE.Vector3());
 
+      // ---- quality: the only thing that decides what the frame can afford ----
+      const quality = new AdaptiveQuality(cls);
+      const pixelRatio = () => Math.min(window.devicePixelRatio, 2) * settings.renderScale;
+      let settings: QualitySettings = quality.settings();
+
       let dist = 3.2;
       const resize = () => {
         const w = host.clientWidth || 1, h = host.clientHeight || 1;
+        renderer.setPixelRatio(pixelRatio());
         renderer.setSize(w, h, false);
         // Render a window onto a larger virtual frame: the subject stays
         // centred in the frame, the window crops it into the right third —
@@ -222,6 +310,42 @@ export default function ForgeStage({
       resize();
       cleanups.push(() => ro.disconnect());
 
+      const stats: ForgeStats = {
+        backend, vertices, particles: 0, pool: particles ? particles.pool : 0, fps: NaN,
+        strikesPerMin: forge.strikesPerMin,
+        device: cls.device, cappedBy: cls.cappedBy, forced: cls.forced, targetFPS: 60,
+        renderScale: 1, flameSteps: cls.flameSteps, reason: '', gpuBytes: particles ? particles.bytes : 0,
+      };
+      window.__forge = { stats };
+      cleanups.push(() => { if (window.__forge?.stats === stats) delete window.__forge; });
+
+      let lastReport = -Infinity, lastKey = '';
+      const report = (force = false) => {
+        const now = performance.now();
+        if (!force && now - lastReport < 250) return;
+        // the strip shows thousands and whole frames; anything finer is noise
+        const shown = Math.round(stats.particles / 1000) * 1000;
+        const fps = Math.round(stats.fps);
+        const k = `${shown}/${fps}`;
+        if (!force && k === lastKey) return;
+        lastReport = now; lastKey = k;
+        readyRef.current?.({ backend, vertices, particles: shown, pool: stats.pool, fps, strikesPerMin: forge.strikesPerMin });
+      };
+
+      quality.subscribe((s) => {
+        const scaleChanged = s.renderScale !== settings.renderScale;
+        settings = s;
+        particles?.applySettings(s);
+        stats.particles = particles ? particles.drawn : 0;
+        stats.fps = s.fps;
+        stats.targetFPS = s.targetFPS;
+        stats.renderScale = s.renderScale;
+        stats.reason = s.reason;
+        if (scaleChanged) resize();
+        report();
+      });
+      report(true);
+
       // Pause when off-screen — but self-heal: an observer that reports false
       // before first layout must not freeze the hero forever.
       let visible = true, skipped = 0;
@@ -239,25 +363,63 @@ export default function ForgeStage({
       // Bloom is what the sketch used UnrealBloomPass for; on WebGPU it is a
       // TSL node graph instead. It is also what makes the flame, the sparks,
       // the molten billet and the lattice read as light rather than as paint.
-      const postProcessing = new THREE.PostProcessing(renderer);
+      const postProcessing = new THREE.RenderPipeline(renderer);
       const scenePass = pass(scene, camera);
       const sceneColor = scenePass.getTextureNode('output');
       // Threshold high enough that only genuinely emissive things glow — at a
-      // lower one the hammer disappears into the flame's glare.
-      postProcessing.outputNode = sceneColor.add(bloom(sceneColor, 0.5, 0.5, 0.36));
+      // lower one the hammer disappears into the flame's glare. The bloom sees
+      // a clamped copy: a handful of additive pixels summing past a few units
+      // would otherwise spread into a disc the size of the rig.
+      postProcessing.outputNode = sceneColor.add(bloom(sceneColor.min(3), 0.5, 0.5, 0.36));
       cleanups.push(() => postProcessing.dispose?.());
 
+      // pointer → group space, on the plane through the letters
+      const ray = new THREE.Raycaster();
+      const plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
+      const hit = new THREE.Vector3();
+      const pointerGroup = (): THREE.Vector3 | null => {
+        if (!pointerIn || reduce) return null;
+        plane.constant = -(forge.group.position.z + WORD.z);
+        ray.setFromCamera(ndc, camera);
+        if (!ray.ray.intersectPlane(plane, hit)) return null;
+        return forge.group.worldToLocal(hit);
+      };
+
       let errLogged = false;
-      let last = performance.now() / 1000;
+      const start = performance.now() / 1000;
+      let last = start;
       renderer.setAnimationLoop(() => {
-        const now = performance.now() / 1000;
+        const nowMs = performance.now();
+        const now = nowMs / 1000;
         const dt = Math.min(now - last, 0.05);
         last = now;
         if (!visible) { if (++skipped % 20 === 0) visible = inView(); return; }
 
+        quality.tick(nowMs);
+        stats.fps = quality.fps;
+        if (particles) stats.particles = particles.drawn;
+
         try {
           forge.tick(reduce ? 0.35 : now, dt);
           lattice.tick(reduce ? 0.35 : now, reduce ? 0 : dt);
+          if (particles) {
+            const since = now - strikeAt;
+            // deposit the cast over ~5 s, bottom layer first
+            const print = reduce ? 1.01 : Math.min(1.01, Math.max(0, (now - start - 0.4) / 5));
+            // the CAD outline leads the print, then steps back to a faint trace
+            lattice.fade = 0.3 + 0.7 * (1 - Math.max(0, Math.min(1, (print - 0.85) / 0.16)));
+            particles.frame(renderer, {
+              t: now - start,
+              dt: reduce ? 0 : dt,
+              print,
+              strikes: forge.strikes,
+              sinceStrike: since,
+              impact: forge.impactGroup,
+              pointer: pointerGroup(),
+              heat: forge.heat,
+              melt: 1 - lattice.logoBlend,
+            });
+          }
         } catch (e) {
           if (!errLogged) { errLogged = true; console.error('[ForgeStage] tick', e); }
         }
@@ -272,27 +434,32 @@ export default function ForgeStage({
         curY += (targetY - curY) * 0.05;
         const drift = reduce ? 0 : Math.sin(now * 0.11) * 0.08;
         const a = curX + drift;
+        // the blow travels up the camera: a few millimetres, gone in 0.2 s
+        const shake = reduce ? 0 : Math.exp(-(now - strikeAt) * 22) * 0.006;
+        // Standing eye-line: above the anvil face and looking down onto it, the
+        // way anyone at a forge sees the work. Level with the face, a blade
+        // lying flat is an edge-on line and turning it over is invisible.
         camera.position.set(
-          mid.x + Math.sin(a) * dist,
-          mid.y + 0.26 + curY,
+          mid.x + Math.sin(a) * dist + Math.sin(now * 91) * shake,
+          mid.y + 1.0 + curY + Math.sin(now * 77 + 1.3) * shake,
           mid.z + Math.cos(a) * dist,
         );
         camera.lookAt(mid.x, mid.y, mid.z);
 
         try { postProcessing.render(); }
         catch (e) { if (!errLogged) { errLogged = true; console.error('[ForgeStage] render', e); } }
+        report();
       });
 
       cleanups.push(() => {
         renderer.setAnimationLoop(null);
         renderer.dispose();
-        canvas.remove();
       });
     })().catch((e) => {
       console.warn('[ForgeStage] falling back to static ground:', e);
       host.style.background =
         'radial-gradient(60% 60% at 58% 52%, rgba(255,107,0,.18), transparent 70%), #0b0c0d';
-      readyRef.current?.({ backend: 'unavailable', vertices: 0 });
+      readyRef.current?.({ backend: 'unavailable', vertices: 0, particles: 0, pool: 0, fps: NaN, strikesPerMin: 0 });
     });
 
     return () => {

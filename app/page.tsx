@@ -29,7 +29,7 @@ export default function Home() {
           <div className="mb-12 grid items-end gap-x-10 gap-y-6 [grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr))]">
             <div>
               <div className={EYEBROW}>01 — Capabilities</div>
-              <h2 className={HEADLINE}>Six ways we make your part real.</h2>
+              <h2 className={HEADLINE}>Five ways we make your part real.</h2>
             </div>
             <p className="max-w-[34ch] text-[15px] leading-[1.65] text-body">
               Hover any card — the scan reveals what the machine sees.

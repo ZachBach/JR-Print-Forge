@@ -208,6 +208,9 @@
         return;
       }
       this._booted = true;
+      // Re-read here: when a framework creates the element (React does),
+      // attributes are set after the constructor has already run.
+      if (this.hasAttribute('hide-toolbar')) this._toolbar.style.display = 'none';
       this._boot().catch((err) => {
         this._err.style.display = 'flex';
         this._err.textContent =

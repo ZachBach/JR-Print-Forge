@@ -124,11 +124,22 @@ export default function Hero() {
           </span>
           {/* Narrow screens keep one proof and one promise, so the strip stays
               a single row and never grows up over the CTAs. */}
+          {/* Particles actually drawn this second, not the pool: the quality
+              manager lowers the count on hardware that can't hold it. */}
           <span className="hidden flex-[1_1_150px] border-r border-white/[.06] px-5 py-[13px] sm:block">
-            Vertices <span className="text-ink">{info ? info.vertices.toLocaleString('en-US') : '—'}</span>
+            {info && info.pool > 0 ? (
+              <>
+                Particles <span className="text-ink tabular-nums">{info.particles.toLocaleString('en-US')}</span>
+              </>
+            ) : (
+              <>
+                Vertices <span className="text-ink">{info ? info.vertices.toLocaleString('en-US') : '—'}</span>
+              </>
+            )}
           </span>
           <span className="hidden flex-[1_1_140px] border-r border-white/[.06] px-5 py-[13px] sm:block">
-            Strikes <span className="text-ink">35/min</span>
+            {/* The cadence the scene actually runs, not a number typed beside it. */}
+            Strikes <span className="text-ink">{info && info.strikesPerMin > 0 ? `${Math.round(info.strikesPerMin)}/min` : '—'}</span>
           </span>
           <span className="flex-[1_1_190px] border-r border-white/[.06] px-5 py-[13px]">
             Quote in <span className="text-ember">1 business day</span>

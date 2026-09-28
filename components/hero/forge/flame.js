@@ -8,8 +8,13 @@
  * density and temperature, integrate emission front-to-back with
  * Beer–Lambert absorption, and colour it through tsl-lib's fire ramp.
  *
+ * A gas forge burns blue where the fuel meets the air and orange above it,
+ * and those happen to be the brand's two accents, so the root of the flame
+ * takes the palette's blue before the fire ramp takes over.
+ *
  * Nodes never own uniforms: heat comes in from the caller.
  */
+import { palette } from './jr-palette.js';
 import { fbm } from './tsl-lib/src/noise/fbm.js';
 import { fireRamp } from './tsl-lib/src/ramp/fireRamp.js';
 
@@ -27,6 +32,7 @@ export function volumetricFire(THREE, TSL, { heat, steps = 26, size = [0.3, 0.42
 
   const hx = size[0] / 2, hy = size[1] / 2, hz = size[2] / 2;
   const half = vec3(hx, hy, hz);
+  const { forge } = palette(TSL);
 
   const field = Fn(() => {
     const camLocal = modelWorldMatrixInverse.mul(vec4(cameraPosition, 1)).xyz;
@@ -63,7 +69,10 @@ export function volumetricFire(THREE, TSL, { heat, steps = 26, size = [0.3, 0.42
       const d = clamp(env.mul(n.mul(1.9)).sub(0.08), 0, 1);
       const temp = d.mul(heat.mul(0.55).add(0.7));
 
-      acc.addAssign(fireRamp(TSL, temp.mul(3.1), { gain: 1.5 }).mul(d).mul(dt).mul(trans).mul(20));
+      // blue root: the bottom sixth of the envelope, strongest on the axis
+      const root = smoothstep(0.2, 0.02, up).mul(smoothstep(width, width.mul(0.2), radial)).mul(0.8);
+      const glow = mix(fireRamp(TSL, temp.mul(3.1), { gain: 1.5 }), forge.blue.mul(1.3), root);
+      acc.addAssign(glow.mul(d.add(root.mul(0.12))).mul(dt).mul(trans).mul(20));
       trans.mulAssign(exp(d.mul(dt).mul(-16)));
       t.addAssign(dt);
     });

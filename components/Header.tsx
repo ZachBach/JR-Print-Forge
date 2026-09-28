@@ -5,6 +5,7 @@ const LINKS = [
   ['#process', 'Process'],
   ['#work', 'Work'],
   ['#why', 'Why Us'],
+  ['/sketch', 'Sketch to Print'],
 ] as const;
 
 export default function Header() {

@@ -2,7 +2,7 @@
  * Page copy, lifted verbatim from the design prototype.
  *
  * Figures marked REPLACE BEFORE LAUNCH in handoff §01 are: the ±0.10 mm
- * tolerance, 12 materials, 100% inspected, the $65 setup fee (lib/pricing.ts)
+ * tolerance, 12 materials, 100% inspected, the $55 setup fee (lib/pricing.ts)
  * and all three testimonials. The 1-business-day quote and 3-business-day
  * build are accurate and stay.
  */
@@ -20,7 +20,7 @@ export const SERVICES: Service[] = [
     title: 'Rapid Prototyping',
     blurb:
       'Iterate in days, not quarters. Functional prototypes off the plate and onto your bench while the idea is still hot.',
-    chips: ['24–72 h', 'FDM + resin'],
+    chips: ['24–72 h', 'FDM'],
   },
   {
     index: '02',
@@ -31,27 +31,20 @@ export const SERVICES: Service[] = [
   },
   {
     index: '03',
-    title: 'Resin Printing',
-    blurb:
-      '8K masked stereolithography for surfaces that need no apology. Housings, masters, miniatures, optics fixtures.',
-    chips: ['25 µm layers', 'Cast ready'],
-  },
-  {
-    index: '04',
     title: 'FDM Printing',
     blurb:
       'Production-grade filament printing in engineering polymers, with hardened nozzles and enclosed chambers.',
     chips: ['0.4 / 0.6 mm', 'Enclosed'],
   },
   {
-    index: '05',
+    index: '04',
     title: 'CAD Design Services',
     blurb:
       'Napkin sketch, mesh scan or half-finished STEP file — we take it to a model that manufactures cleanly.',
     chips: ['DFM review', 'STEP + STL out'],
   },
   {
-    index: '06',
+    index: '05',
     title: 'Production Runs',
     blurb:
       'Small-batch manufacturing with repeatable fixtures, batch inspection and serialized, archived output.',
@@ -171,7 +164,7 @@ export const STATS: Stat[] = [
     decimals: 2,
     unit: 'mm',
     title: 'Precision Manufacturing',
-    blurb: 'Typical achievable tolerance on FDM features. Tighter on resin.',
+    blurb: 'Typical achievable tolerance on FDM features.',
     tone: 'blue',
   },
   {
@@ -179,7 +172,7 @@ export const STATS: Stat[] = [
     decimals: 0,
     unit: 'materials',
     title: 'Quality Materials',
-    blurb: 'Named, traceable polymers and resins — never mystery filament.',
+    blurb: 'Named, traceable polymers — never mystery filament.',
     tone: 'blue',
   },
   {
@@ -233,7 +226,7 @@ export interface Faq {
 export const FAQS: Faq[] = [
   {
     q: 'What tolerance can you actually hold?',
-    a: 'Typically ±0.10 mm on FDM features and tighter on resin. Anything critical gets called out on the quote before we print, not after.',
+    a: 'Typically ±0.10 mm on FDM features. Anything critical gets called out on the quote before we print, not after.',
   },
   {
     q: 'Do press-fits and threads come out to size?',

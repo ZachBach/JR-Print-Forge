@@ -235,6 +235,7 @@ export function buildLogoMorph(THREE, TSL, {
   const uMorph = TSL.uniform(0);
   const uGlow = TSL.uniform(0);
   const uAway = TSL.uniform(0); // 0 while on the logo, 1 while fully a surface
+  const uFade = TSL.uniform(1); // overall strength, set by the caller
 
   const mat = new THREE.LineBasicNodeMaterial({
     transparent: true,
@@ -269,7 +270,8 @@ export function buildLogoMorph(THREE, TSL, {
   mat.opacityNode = TSL.float(0.30)
     .add(wave.mul(0.30))
     .add(uGlow.mul(0.30))
-    .add(uAway.mul(0.12));
+    .add(uAway.mul(0.12))
+    .mul(uFade);
 
   const mesh = new THREE.LineSegments(geometry, mat);
   mesh.name = 'logo_lattice';
@@ -306,6 +308,9 @@ export function buildLogoMorph(THREE, TSL, {
       if (state === 'surface') return 0;
       return state === 'toSurface' ? 1 - uMorph.value : uMorph.value;
     },
+    /** Overall line strength, 0..1. */
+    set fade(v) { uFade.value = v; },
+    get fade() { return uFade.value; },
     /** Called on every hammer blow; only one that lands on a settled logo takes. */
     requestMorph() {
       if (state !== 'logo' || timer < MIN_LOGO_HOLD) return;
