@@ -116,6 +116,40 @@ export function simplifyRing(r: Ring, tol: number): Ring | null {
 }
 
 /**
+ * Drop points that sit exactly on the line between their neighbours.
+ *
+ * A traced straight edge has a vertex at every cell boundary it crosses, all of
+ * them precisely collinear, and a run of them carries no information. Removing
+ * them first is what makes corner recovery reliable: afterwards a grid chamfer is
+ * a single short segment between two long ones whatever the tolerance, where if
+ * RDP runs first it can keep one end of a chamfer and drop the other — leaving a
+ * plate with three square corners and one clipped one, depending on where the
+ * simplification happened to start.
+ *
+ * `eps` is float slack, not a tolerance: these points are collinear by
+ * construction, not approximately.
+ */
+export function dropCollinear(r: Ring, eps = 1e-6): Ring {
+  const n = pointCount(r);
+  if (n < 4) return r;
+  const out: Ring = [];
+  for (let i = 0; i < n; i++) {
+    const p = ((i - 1 + n) % n) * 2;
+    const c = i * 2;
+    const q = ((i + 1) % n) * 2;
+    const ax = r[c] - r[p];
+    const ay = r[c + 1] - r[p + 1];
+    const bx = r[q] - r[c];
+    const by = r[q + 1] - r[c + 1];
+    const cross = ax * by - ay * bx;
+    const scale = Math.hypot(ax, ay) * Math.hypot(bx, by);
+    // Keep a corner, and keep a spike where the edge doubles back on itself.
+    if (Math.abs(cross) > eps * Math.max(scale, 1) || ax * bx + ay * by < 0) out.push(r[c], r[c + 1]);
+  }
+  return out.length >= 6 ? out : r;
+}
+
+/**
  * Put back the corners the cell grid cut off.
  *
  * Tracing the zero level of a distance field places the outline halfway between
@@ -194,13 +228,21 @@ export function sharpenRing(r: Ring, maxCut: number): Ring {
  * direction off the edge order.
  */
 export function simplifyProfile(p: Profile, tol: number, sharpen = 0): Profile | null {
-  const fix = (r: Ring, ccw: boolean) => orient(sharpen > 0 ? sharpenRing(r, sharpen) : r, ccw);
-  const outer = simplifyRing(p.outer, tol);
+  // Order matters: collapse the straight runs, square up the grid's chamfers on
+  // the result, and only then simplify. Sharpening after RDP would depend on
+  // which chamfer points RDP happened to keep.
+  const fix = (r: Ring, ccw: boolean): Ring | null => {
+    const bare = dropCollinear(r);
+    const sharp = sharpen > 0 ? sharpenRing(bare, sharpen) : bare;
+    const done = simplifyRing(sharp, tol);
+    return done && orient(done, ccw);
+  };
+  const outer = fix(p.outer, true);
   if (!outer) return null;
   const holes: Ring[] = [];
   for (const h of p.holes) {
-    const s = simplifyRing(h, tol);
-    if (s) holes.push(fix(s, false));
+    const s = fix(h, false);
+    if (s) holes.push(s);
   }
-  return { outer: fix(outer, true), holes };
+  return { outer, holes };
 }

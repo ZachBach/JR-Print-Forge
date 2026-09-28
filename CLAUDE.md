@@ -115,15 +115,28 @@ on it.
 `contour.ts` (mask → signed distance field → marching squares at the zero level, so the outline sits
 between cells rather than on them) → `polygon.ts` (winding and containment: outer rings CCW, holes CW —
 every consumer takes its outward direction from the edge order, so that convention is load-bearing) →
-`simplify.ts` (RDP to a stated mm tolerance, then `sharpenRing` puts back the half-cell chamfer marching
-squares takes off every convex corner) → `triangulate.ts` (ear clipping with bridged holes) →
+`simplify.ts` (`dropCollinear` → `sharpenRing` → RDP to a stated mm tolerance — **in that order**: collapsing
+the straight runs first makes the grid's half-cell corner chamfer a single short segment that can be squared
+up reliably, where simplifying first leaves it depending on which chamfer points RDP happened to keep) →
+`triangulate.ts` (ear clipping with bridged holes) →
 `solid.ts` (profile × two Z planes → watertight mesh) → `model.ts` (`toCad`: recover the distinct heights
 and extrude each as a pad, bottom up, like the part would be modelled).
 
 Outputs: `step.ts` (AP214 `MANIFOLD_SOLID_BREP`, planar faces, the cap carrying holes as inner loops),
-`dxf.ts` (R12, one closed polyline per ring, a layer per body), `threemf.ts` (one object per body with its
-own base material, so the plate and design can go to different filaments), `print.ts` (layer arithmetic,
-filament mass, plate fit).
+`dxf.ts` (R12, one closed polyline per ring, a layer per body; a ring that fits a circle is written as a
+true `CIRCLE`), `threemf.ts` (one object per body with its own base material, so the plate and design can go
+to different filaments), `print.ts` (layer arithmetic, filament mass, plate fit).
+
+`features.ts` reads nominal dimensions back off the outline — a rasterised keyring hole becomes "Ø5.24 mm"
+rather than a thirty-sided polygon. Its `residual` is measured at edge *midpoints* as well as vertices, and
+that is the whole point: simplification keeps vertices on the curve, so a circle cut to eight points has all
+eight exactly on it while its edges bow 0.76 mm inside. Judging on vertices alone would substitute a `CIRCLE`
+most of a millimetre bigger than the part. Diameters are reported as measured, never snapped to the number
+the design probably meant — the traced hole is the hole that gets printed.
+
+`overlay.ts` turns the outline into SVG paths in grid-cell coordinates, drawn over the height map in the
+studio. It is the only part of the CAD pipeline the customer can actually see, and it is how a bad trace
+(a closed gap, a swallowed stroke) gets caught before an order.
 
 Things to keep in mind here:
 

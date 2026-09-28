@@ -60,6 +60,8 @@ export interface CadModel {
   mesh: Mesh;
   /** The tolerance actually used, mm. */
   tolerance: number;
+  /** The grid pitch the outlines were traced from, mm — the floor on their accuracy. */
+  cell: number;
   /** Distinct flat heights found, ascending, mm. */
   levels: number[];
   /** Straight segments in the whole model — the CAD-side size of the part. */
@@ -165,6 +167,6 @@ export function toCad(field: HeightField, opts: CadOptions = {}): CadResult {
   if (!bodies.length) return { ok: false, reason: 'Nothing to build yet.' };
   return {
     ok: true,
-    model: { bodies, mesh: mergeMeshes(bodies.map((b) => b.mesh)), tolerance, levels, segments },
+    model: { bodies, mesh: mergeMeshes(bodies.map((b) => b.mesh)), tolerance, cell, levels, segments },
   };
 }

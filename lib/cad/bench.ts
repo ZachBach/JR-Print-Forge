@@ -21,6 +21,7 @@ import {
   type ProductSpec,
 } from '../relief/products.ts';
 import { bodyNames, toCad } from './model.ts';
+import { bodyFeatures, describeFeatures } from './features.ts';
 import { printReport } from './print.ts';
 import { toStep } from './step.ts';
 import { toDxf } from './dxf.ts';
@@ -89,18 +90,26 @@ for (const [name, spec, img, want, source] of cases) {
   }
   const { model } = res;
   const step = toStep(model.bodies, { title: name });
-  const dxf = toDxf(model.bodies.map((x) => ({ name: x.name, profiles: x.profiles, z: x.z1 })));
+  const dxf = toDxf(
+    model.bodies.map((x) => ({ name: x.name, profiles: x.profiles, z: x.z1 })),
+    { circleTolerance: model.tolerance + model.cell * 0.75 },
+  );
   const three = toMulti3mf(
     model.bodies.map((x, i) => ({ name: x.name, mesh: x.mesh, colour: i ? '#FF6B00' : '#2A2C2E', extruder: i + 1 })),
     { title: name },
   );
   const report = printReport(model);
+  const featureTol = model.tolerance + model.cell * 0.75;
 
   console.log(
     `${name.padEnd(29)} ${`${b.field.cols}×${b.field.rows}`.padEnd(10)} ${String(model.bodies.length).padStart(6)} ` +
       `${String(mesh.triangles).padStart(9)} ${String(model.mesh.triangles).padStart(10)} ${tc} ` +
       `${kb(step.length)} ${kb(dxf.length)} ${kb(three.length)} ${report.grams.toFixed(1).padStart(5)}`,
   );
+  for (const b2 of model.bodies) {
+    const f = describeFeatures(bodyFeatures(b2.profiles, featureTol));
+    if (f.length) console.log(`      ${b2.name}: ${f.join(', ')}`);
+  }
   for (const w of report.warnings) console.log(`      ! ${w}`);
 
   if (outDir) {

@@ -14,13 +14,23 @@
  * Each body's outlines go on their own layer, at that body's top height, so the
  * layers stack in Z the way the part does.
  */
-import { bbox, type Profile } from './polygon.ts';
+import { bbox, type Profile, type Ring } from './polygon.ts';
+import { asCircle } from './features.ts';
 
 export interface DxfBody {
   name: string;
   profiles: Profile[];
   /** The plane to draw this body's outlines on, mm. */
   z: number;
+}
+
+export interface DxfOptions {
+  /**
+   * Rings that fit a circle this closely are written as a CIRCLE rather than a
+   * polygon, so a keyring hole arrives as Ø5 mm that can be resized, not as a
+   * thirty-sided approximation of it. 0 disables the substitution.
+   */
+  circleTolerance?: number;
 }
 
 /** R12 layer names are conservative: upper case, no spaces, 31 characters. */
@@ -41,7 +51,8 @@ const r = (v: number) => (Math.round(v * 1e6) / 1e6).toFixed(6);
 /** AutoCAD colour indices, cycled per layer so the levels are told apart. */
 const COLOURS = [7, 1, 3, 5, 6, 2, 4, 8];
 
-export function toDxf(bodies: DxfBody[]): string {
+export function toDxf(bodies: DxfBody[], opts: DxfOptions = {}): string {
+  const circleTol = opts.circleTolerance ?? 0;
   const layers = bodies.map((b, i) => ({
     name: layerName(b.name, `LEVEL_${i + 1}`),
     colour: COLOURS[i % COLOURS.length],
@@ -85,24 +96,22 @@ export function toDxf(bodies: DxfBody[]): string {
   out += g(0, 'ENDTAB') + g(0, 'ENDSEC');
 
   out += g(0, 'SECTION') + g(2, 'ENTITIES');
+  const ringEntity = (ring: Ring, layer: string, z: number): string => {
+    const round = circleTol > 0 ? asCircle(ring, circleTol) : null;
+    if (round) {
+      return g(0, 'CIRCLE') + g(8, layer) + g(10, r(round.cx)) + g(20, r(round.cy)) + g(30, r(z)) + g(40, r(round.r));
+    }
+    // 66 = vertices follow, 70 bit 1 = closed. The polyline's own 10/20/30 are
+    // unused by the format but expected to be present.
+    let s = g(0, 'POLYLINE') + g(8, layer) + g(66, 1) + g(70, 1) + g(10, r(0)) + g(20, r(0)) + g(30, r(z));
+    for (let k = 0; k < ring.length; k += 2) {
+      s += g(0, 'VERTEX') + g(8, layer) + g(10, r(ring[k])) + g(20, r(ring[k + 1])) + g(30, r(z));
+    }
+    return s + g(0, 'SEQEND') + g(8, layer);
+  };
   for (const l of layers) {
     for (const p of l.body.profiles) {
-      for (const ring of [p.outer, ...p.holes]) {
-        // 66 = vertices follow, 70 bit 1 = closed. The polyline's own 10/20/30
-        // are unused by the format but expected to be present.
-        out +=
-          g(0, 'POLYLINE') +
-          g(8, l.name) +
-          g(66, 1) +
-          g(70, 1) +
-          g(10, r(0)) +
-          g(20, r(0)) +
-          g(30, r(l.body.z));
-        for (let k = 0; k < ring.length; k += 2) {
-          out += g(0, 'VERTEX') + g(8, l.name) + g(10, r(ring[k])) + g(20, r(ring[k + 1])) + g(30, r(l.body.z));
-        }
-        out += g(0, 'SEQEND') + g(8, l.name);
-      }
+      for (const ring of [p.outer, ...p.holes]) out += ringEntity(ring, l.name, l.body.z);
     }
   }
   out += g(0, 'ENDSEC') + g(0, 'EOF');

@@ -291,7 +291,9 @@ export default function SketchStudio() {
           const s = cad.summary;
           lines.push(
             `CAD: ${s.bodies.length} extruded ${s.bodies.length === 1 ? 'body' : 'bodies'} ` +
-              `(${s.bodies.map((b) => `${b.name} ${mm(b.z1 - b.z0)}`).join(', ')}), outlines simplified to ` +
+              `(${s.bodies
+                .map((b) => `${b.name} ${mm(b.z1 - b.z0)}${b.features.length ? ` — ${b.features.join(', ')}` : ''}`)
+                .join('; ')}), outlines simplified to ` +
               `±${s.tolerance.toFixed(2)} mm, ${s.segments} segments. STEP solid + DXF outlines attached` +
               (s.bodies.length > 1 ? ', plus a 3MF split per body for two-colour printing' : '') +
               `. ${s.grams.toFixed(1)} g solid at ${mm(s.layerHeight, 2)} layers.`,
@@ -403,8 +405,33 @@ export default function SketchStudio() {
               </span>
             </label>
             <figure className="m-0 flex flex-col items-center justify-center gap-1.5 border border-white/10 bg-ground p-2">
-              <canvas ref={thumbRef} className="max-h-[72px] w-full object-contain" aria-label="Height map of the part, top-down" />
-              <figcaption className="font-mono text-[8.5px] uppercase tracking-[.14em] text-dim">Height map</figcaption>
+              {/* The traced outline sits on the height map so the CAD reading of
+                  the drawing can be checked by eye, not taken on trust. */}
+              <div className="relative flex w-full items-center justify-center">
+                <canvas ref={thumbRef} className="max-h-[72px] w-full object-contain" aria-label="Height map of the part, top-down" />
+                {cad?.ok && (
+                  <svg
+                    viewBox={`0 0 ${cad.summary.outline.width} ${cad.summary.outline.height}`}
+                    preserveAspectRatio="xMidYMid meet"
+                    className="pointer-events-none absolute inset-0 size-full"
+                    aria-hidden="true"
+                  >
+                    {cad.summary.outline.paths.map((d, i) => (
+                      <path
+                        key={i}
+                        d={d}
+                        fill="none"
+                        strokeWidth={1}
+                        vectorEffect="non-scaling-stroke"
+                        className={i === 0 ? 'stroke-blue' : 'stroke-ember'}
+                      />
+                    ))}
+                  </svg>
+                )}
+              </div>
+              <figcaption className="font-mono text-[8.5px] uppercase tracking-[.14em] text-dim">
+                {cad?.ok ? 'Height map · CAD outline' : 'Height map'}
+              </figcaption>
             </figure>
           </div>
           <input
@@ -585,10 +612,14 @@ export default function SketchStudio() {
                   <dl className="m-0 mt-3 grid grid-cols-[1fr_auto] gap-x-3.5 gap-y-2.5 text-[13px]">
                     {cad.summary.bodies.map((b) => (
                       <div key={b.name} className="contents">
-                        <dt className="text-body">{b.name}</dt>
+                        <dt className="text-body">
+                          {b.name}
+                          {b.features.length > 0 && (
+                            <span className="block text-[11px] leading-[1.5] text-dim">{b.features.join(' · ')}</span>
+                          )}
+                        </dt>
                         <dd className="m-0 text-right font-mono text-ink">
                           {mm(b.z1 - b.z0)} · {Math.round(b.layers)} layers · {b.segments} seg
-                          {b.holes > 0 ? ` · ${b.holes} hole${b.holes > 1 ? 's' : ''}` : ''}
                         </dd>
                       </div>
                     ))}

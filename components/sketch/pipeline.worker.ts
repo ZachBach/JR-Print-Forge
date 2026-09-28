@@ -10,6 +10,8 @@ import { build, sizeWarnings, type ImageSettings, type ProductKind, type Product
 import { meshHeightField, type HeightField, type Mesh } from '@/lib/relief/mesh';
 import { to3mf, toStl } from '@/lib/relief/export';
 import { bodyNames, toCad, type CadModel } from '@/lib/cad/model';
+import { bodyFeatures, describeFeatures } from '@/lib/cad/features';
+import { outlinePaths, type Outline } from '@/lib/cad/overlay';
 import { printReport, type LayerKey, type PlateKey } from '@/lib/cad/print';
 import { toStep } from '@/lib/cad/step';
 import { toDxf } from '@/lib/cad/dxf';
@@ -60,6 +62,8 @@ export interface CadSummary {
     triangles: number;
     /** Thickness in layers at the chosen layer height. */
     layers: number;
+    /** Nominal dimensions read back off the outline — "round hole Ø5 mm". */
+    features: string[];
   }[];
   /** Outline simplification tolerance, mm. */
   tolerance: number;
@@ -68,6 +72,15 @@ export interface CadSummary {
   layerHeight: number;
   /** Solid mass at the chosen material's density, g. */
   grams: number;
+  /**
+   * The traced outline, ready to draw over the height map — one SVG path per
+   * body, in cell units with the origin at the top-left of the grid, so it lines
+   * up with the thumbnail without the page needing to know the grid at all.
+   *
+   * This is what lets someone check the conversion instead of trusting it: if the
+   * outline does not follow the drawing, it is visible before anything is ordered.
+   */
+  outline: Outline;
   warnings: string[];
   ms: number;
 }
@@ -93,6 +106,13 @@ export type WorkerResponse =
 
 /** Outline segments past which the CAD model is retraced at a coarser tolerance. */
 const SEGMENT_BUDGET = 20_000;
+
+/**
+ * How far a ring may stray from a circle and still be called one. Both terms
+ * matter: the outline was simplified to `tolerance`, and before that the tracer
+ * could only place it to within about half a cell of where the drawing put it.
+ */
+const circleTolerance = (tolerance: number, cell: number) => tolerance + cell * 0.75;
 
 let last: Mesh | null = null;
 // The field the last mesh came from, and the CAD model derived from it. Both stay
@@ -186,6 +206,7 @@ self.onmessage = (e: MessageEvent<WorkerRequest>) => {
       }
       cad = res.model;
       const report = printReport(cad, { layer: req.layer, material: req.material, plate: req.plate });
+      const featureTol = circleTolerance(cad.tolerance, cad.cell);
       post({
         id: req.id,
         type: 'cad',
@@ -198,12 +219,14 @@ self.onmessage = (e: MessageEvent<WorkerRequest>) => {
             holes: b.profiles.reduce((n, p) => n + p.holes.length, 0),
             triangles: b.mesh.triangles,
             layers: report.steps[i]?.layers ?? 0,
+            features: describeFeatures(bodyFeatures(b.profiles, featureTol)),
           })),
           tolerance: cad.tolerance,
           segments: cad.segments,
           triangles: cad.mesh.triangles,
           layerHeight: report.layerHeight,
           grams: report.grams,
+          outline: outlinePaths(cad, lastField.cols, lastField.rows),
           warnings: report.warnings,
           ms: performance.now() - t0,
         },
@@ -218,7 +241,12 @@ self.onmessage = (e: MessageEvent<WorkerRequest>) => {
       if (req.format === 'step') {
         bytes = strToArrayBuffer(toStep(cad.bodies, { title: req.title, description: req.description }));
       } else if (req.format === 'dxf') {
-        bytes = strToArrayBuffer(toDxf(cad.bodies.map((b) => ({ name: b.name, profiles: b.profiles, z: b.z1 }))));
+        bytes = strToArrayBuffer(
+          toDxf(
+            cad.bodies.map((b) => ({ name: b.name, profiles: b.profiles, z: b.z1 })),
+            { circleTolerance: circleTolerance(cad.tolerance, cad.cell) },
+          ),
+        );
       } else {
         bytes = toMulti3mf(
           cad.bodies.map((b, i) => ({ name: b.name, mesh: b.mesh, colour: colour(i), extruder: i + 1 })),
