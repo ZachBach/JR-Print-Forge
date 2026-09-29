@@ -3,7 +3,8 @@
 Split a painted multi-colour 3MF (Bambu Studio / PrusaSlicer) into pieces that
 each print with one filament — or two, one per nozzle, on a dual-nozzle printer
 (Bambu H2D, Prusa XL, IDEX) — and glue back together. No filament changes
-inside a print means no purge, no prime tower and no colour bleed.
+inside a print means no purge and no colour bleed. (One-filament plates need no
+prime tower either; two-nozzle plates still get one for the nozzle switch.)
 
     python split_by_color.py model.3mf out/ --colours-per-piece 2 --drop-slot 10
 

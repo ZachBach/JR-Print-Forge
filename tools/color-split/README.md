@@ -2,7 +2,8 @@
 
 Turns a painted multi-colour 3MF (Bambu Studio or PrusaSlicer) into pieces that print with one
 filament each — or two, one per nozzle, on a dual-nozzle printer — and glue back together. No
-filament changes inside a print: no purge, no prime tower, no colour bleed.
+filament changes inside a print: no purge, no colour bleed. One-filament plates need no prime tower
+either; two-nozzle plates still get one for the nozzle switch.
 
 ```bash
 python -m venv .venv && .venv/Scripts/pip install -r requirements.txt   # once
